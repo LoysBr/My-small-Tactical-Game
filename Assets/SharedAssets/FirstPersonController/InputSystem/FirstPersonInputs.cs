@@ -8,8 +8,7 @@ namespace StarterAssets
     public class StarterAssetsInputs : MonoBehaviour
     {
         [Header("Character Input Values")]
-        [SerializeField] private SimpleScriptableObjectEvent m_pauseScriptableEvent;
-
+        [SerializeField] private SimpleScriptableObjectEvent m_pauseSOEvent;
 
         [Header("Character Input Values")]
         public Vector2 move;
@@ -27,7 +26,6 @@ namespace StarterAssets
         public PlayerManager CameraManager;
 
         private bool m_IgnoreInput;
-
 
         private static bool m_FocusActionsSetUp;
 
@@ -115,7 +113,7 @@ namespace StarterAssets
         {
             Debug.Log("OnPauseGame input action");
 
-            m_pauseScriptableEvent?.Raise();
+            m_pauseSOEvent?.Raise();
         }
 #endif
 

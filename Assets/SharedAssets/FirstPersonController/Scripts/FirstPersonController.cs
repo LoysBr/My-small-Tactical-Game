@@ -32,6 +32,7 @@ namespace StarterAssets
         public float JumpTimeout = 0.1f;
         [Tooltip("Time required to pass before entering the fall state. Useful for walking down stairs")]
         public float FallTimeout = 0.15f;
+        [SerializeField] private IntScriptableObjectEvent m_jumpCountUpdatedEvent;
 
         [Header("Player Grounded")]
         [Tooltip("If the character is grounded or not. Not part of the CharacterController built in grounded check")]
@@ -63,6 +64,8 @@ namespace StarterAssets
         // timeout deltatime
         private float _jumpTimeoutDelta;
         private float _fallTimeoutDelta;
+
+        private int m_jumpNumber = 0;
 
 
 #if ENABLE_INPUT_SYSTEM
@@ -126,7 +129,18 @@ namespace StarterAssets
         {
             // set sphere position, with offset
             Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z);
-            Grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers, QueryTriggerInteraction.Ignore);
+
+            bool newGrounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers, QueryTriggerInteraction.Ignore);
+            if (Grounded != newGrounded)
+            {
+                Grounded = newGrounded;
+
+                if (!Grounded)
+                {
+                    m_jumpNumber++;
+                    m_jumpCountUpdatedEvent?.Raise(m_jumpNumber);
+                }
+            }
         }
 
         private void CameraRotation()
