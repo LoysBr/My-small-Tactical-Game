@@ -1,12 +1,5 @@
 fileFormatVersion: 2
-guid: cd5240ed4bf54a14ebfb4040a359fa63
-AssetOrigin:
-  serializedVersion: 1
-  productId: 306857
-  packageName: Stylized Low Poly Skeleton
-  packageVersion: 1.1
-  assetPath: Assets/SazenGames/Skeleton/Art/Animations/RootMotion/Skeleton_walk_forward_RM.fbx
-  uploadId: 792234
+guid: 2e8f4107cb3e3ca46883369e1ebb4ed0
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
@@ -50,7 +43,7 @@ ModelImporter:
       loop: 0
       hasAdditiveReferencePose: 0
       loopTime: 1
-      loopBlend: 0
+      loopBlend: 1
       loopBlendOrientation: 0
       loopBlendPositionY: 0
       loopBlendPositionXZ: 0
@@ -70,25 +63,16 @@ ModelImporter:
             value: 1
             inSlope: 0
             outSlope: 0
-            tangentMode: 0
+            tangentMode: 34
             weightedMode: 0
             inWeight: 0
             outWeight: 0
           - serializedVersion: 3
-            time: 4.3638506
-            value: -1
-            inSlope: 0.2151019
-            outSlope: 0.2151019
-            tangentMode: 0
-            weightedMode: 0
-            inWeight: 0.33333334
-            outWeight: 0.33333334
-          - serializedVersion: 3
-            time: 7.00296
-            value: 1.0049515
+            time: 1
+            value: 1
             inSlope: 0
             outSlope: 0
-            tangentMode: 0
+            tangentMode: 34
             weightedMode: 0
             inWeight: 0
             outWeight: 0
