@@ -743,34 +743,43 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82e26807fca401943a61ddd7b3fabe6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_boost: 3.5
-  positionLerpTime: 0.2
-  mouseSensitivityCurve:
+  m_PositionLerpTime: 0.541
+  m_TranslationSpeed: 7.99
+  m_RotationSensitivityCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 0
-      value: 0.5
-      inSlope: 0
-      outSlope: 5
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 2.5
+      time: 0.007698059
+      value: 0.10064697
       inSlope: 0
       outSlope: 0
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
       outWeight: 0
+    - serializedVersion: 3
+      time: 7.6469183
+      value: 0.18270773
+      inSlope: 0.003770389
+      outSlope: 0.003770389
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.1133391
+      outWeight: 0.07101827
+    - serializedVersion: 3
+      time: 20
+      value: 0.2
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.03745304
+      outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  rotationLerpTime: 0.01
-  invertY: 0
+  m_RotationLerpTime: 0.28
+  m_InvertY: 0
 --- !u!4 &342918855 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2199628841774520173, guid: 61b3e3801d56a3f429556c96ea2f07d6, type: 3}

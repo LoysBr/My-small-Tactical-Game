@@ -970,6 +970,24 @@
                     "initialStateCheck": true
                 },
                 {
+                    "name": "CameraRotationAxis",
+                    "type": "PassThrough",
+                    "id": "2f27ef59-a8f0-44c0-a10d-559c8196bda2",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "CameraButton",
+                    "type": "PassThrough",
+                    "id": "bd7ab5b2-210d-47ba-9055-ee1b7ec14cb5",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
                     "name": "Down",
                     "type": "Button",
                     "id": "01fed3f4-8734-4ffb-b4a4-ad2932ba9ff5",
@@ -1024,6 +1042,61 @@
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
                     "action": "Up",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "07255094-1f6e-4b3d-84d5-2236a8c0f9df",
+                    "path": "<Mouse>/delta",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "CameraRotationAxis",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "309263cf-64e1-40ab-980e-71cce37d8cc8",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "CameraButton",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3473f06a-9c96-4c08-a581-8bbed18e0af0",
+                    "path": "<Pen>/tip",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "CameraButton",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "012ee462-f555-43c9-96fd-c6fb4a2c98e2",
+                    "path": "<Touchscreen>/touch*/press",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Touch",
+                    "action": "CameraButton",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5f20410c-bb3f-4f1d-b931-972445926e7f",
+                    "path": "<XRController>/trigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "XR",
+                    "action": "CameraButton",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

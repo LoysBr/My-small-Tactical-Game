@@ -1058,6 +1058,24 @@ namespace UnityEngine.InputSystem
                     ""initialStateCheck"": true
                 },
                 {
+                    ""name"": ""CameraRotationAxis"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""2f27ef59-a8f0-44c0-a10d-559c8196bda2"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""CameraButton"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""bd7ab5b2-210d-47ba-9055-ee1b7ec14cb5"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
                     ""name"": ""Down"",
                     ""type"": ""Button"",
                     ""id"": ""01fed3f4-8734-4ffb-b4a4-ad2932ba9ff5"",
@@ -1112,6 +1130,61 @@ namespace UnityEngine.InputSystem
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
                     ""action"": ""Up"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""07255094-1f6e-4b3d-84d5-2236a8c0f9df"",
+                    ""path"": ""<Mouse>/delta"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""CameraRotationAxis"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""309263cf-64e1-40ab-980e-71cce37d8cc8"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""CameraButton"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3473f06a-9c96-4c08-a581-8bbed18e0af0"",
+                    ""path"": ""<Pen>/tip"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""CameraButton"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""012ee462-f555-43c9-96fd-c6fb4a2c98e2"",
+                    ""path"": ""<Touchscreen>/touch*/press"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Touch"",
+                    ""action"": ""CameraButton"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5f20410c-bb3f-4f1d-b931-972445926e7f"",
+                    ""path"": ""<XRController>/trigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""XR"",
+                    ""action"": ""CameraButton"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1264,6 +1337,8 @@ namespace UnityEngine.InputSystem
             // CameraMovement
             m_CameraMovement = asset.FindActionMap("CameraMovement", throwIfNotFound: true);
             m_CameraMovement_Up = m_CameraMovement.FindAction("Up", throwIfNotFound: true);
+            m_CameraMovement_CameraRotationAxis = m_CameraMovement.FindAction("CameraRotationAxis", throwIfNotFound: true);
+            m_CameraMovement_CameraButton = m_CameraMovement.FindAction("CameraButton", throwIfNotFound: true);
             m_CameraMovement_Down = m_CameraMovement.FindAction("Down", throwIfNotFound: true);
             m_CameraMovement_Forward = m_CameraMovement.FindAction("Forward", throwIfNotFound: true);
             m_CameraMovement_Backward = m_CameraMovement.FindAction("Backward", throwIfNotFound: true);
@@ -1817,6 +1892,8 @@ namespace UnityEngine.InputSystem
         private readonly InputActionMap m_CameraMovement;
         private List<ICameraMovementActions> m_CameraMovementActionsCallbackInterfaces = new List<ICameraMovementActions>();
         private readonly InputAction m_CameraMovement_Up;
+        private readonly InputAction m_CameraMovement_CameraRotationAxis;
+        private readonly InputAction m_CameraMovement_CameraButton;
         private readonly InputAction m_CameraMovement_Down;
         private readonly InputAction m_CameraMovement_Forward;
         private readonly InputAction m_CameraMovement_Backward;
@@ -1837,6 +1914,14 @@ namespace UnityEngine.InputSystem
             /// Provides access to the underlying input action "CameraMovement/Up".
             /// </summary>
             public InputAction @Up => m_Wrapper.m_CameraMovement_Up;
+            /// <summary>
+            /// Provides access to the underlying input action "CameraMovement/CameraRotationAxis".
+            /// </summary>
+            public InputAction @CameraRotationAxis => m_Wrapper.m_CameraMovement_CameraRotationAxis;
+            /// <summary>
+            /// Provides access to the underlying input action "CameraMovement/CameraButton".
+            /// </summary>
+            public InputAction @CameraButton => m_Wrapper.m_CameraMovement_CameraButton;
             /// <summary>
             /// Provides access to the underlying input action "CameraMovement/Down".
             /// </summary>
@@ -1886,6 +1971,12 @@ namespace UnityEngine.InputSystem
                 @Up.started += instance.OnUp;
                 @Up.performed += instance.OnUp;
                 @Up.canceled += instance.OnUp;
+                @CameraRotationAxis.started += instance.OnCameraRotationAxis;
+                @CameraRotationAxis.performed += instance.OnCameraRotationAxis;
+                @CameraRotationAxis.canceled += instance.OnCameraRotationAxis;
+                @CameraButton.started += instance.OnCameraButton;
+                @CameraButton.performed += instance.OnCameraButton;
+                @CameraButton.canceled += instance.OnCameraButton;
                 @Down.started += instance.OnDown;
                 @Down.performed += instance.OnDown;
                 @Down.canceled += instance.OnDown;
@@ -1915,6 +2006,12 @@ namespace UnityEngine.InputSystem
                 @Up.started -= instance.OnUp;
                 @Up.performed -= instance.OnUp;
                 @Up.canceled -= instance.OnUp;
+                @CameraRotationAxis.started -= instance.OnCameraRotationAxis;
+                @CameraRotationAxis.performed -= instance.OnCameraRotationAxis;
+                @CameraRotationAxis.canceled -= instance.OnCameraRotationAxis;
+                @CameraButton.started -= instance.OnCameraButton;
+                @CameraButton.performed -= instance.OnCameraButton;
+                @CameraButton.canceled -= instance.OnCameraButton;
                 @Down.started -= instance.OnDown;
                 @Down.performed -= instance.OnDown;
                 @Down.canceled -= instance.OnDown;
@@ -2199,6 +2296,20 @@ namespace UnityEngine.InputSystem
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnUp(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "CameraRotationAxis" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnCameraRotationAxis(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "CameraButton" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnCameraButton(InputAction.CallbackContext context);
             /// <summary>
             /// Method invoked when associated input action "Down" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
