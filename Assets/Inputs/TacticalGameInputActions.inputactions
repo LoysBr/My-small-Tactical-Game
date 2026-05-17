@@ -778,16 +778,7 @@
             "id": "5b58700f-9612-42cc-b828-586d77755b0f",
             "actions": [
                 {
-                    "name": "Point",
-                    "type": "PassThrough",
-                    "id": "9f3bfcc5-e168-4451-8de1-5feb2c1a18db",
-                    "expectedControlType": "Vector2",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
-                },
-                {
-                    "name": "LeftClick",
+                    "name": "MoveCharacterToSelectedPosition",
                     "type": "PassThrough",
                     "id": "3ff5df96-9ead-4a8b-88ee-1c8cc875f66a",
                     "expectedControlType": "Button",
@@ -809,15 +800,6 @@
                     "type": "PassThrough",
                     "id": "fa052ec0-89fa-4560-a4d3-079c78b27174",
                     "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "ScrollWheel",
-                    "type": "PassThrough",
-                    "id": "be4be1fb-c5c5-4ad3-96c5-d46903c707b9",
-                    "expectedControlType": "Vector2",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -857,23 +839,12 @@
                 },
                 {
                     "name": "",
-                    "id": "23407d75-84cd-4006-af86-07951b34e954",
-                    "path": "<Mouse>/scroll",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Keyboard&Mouse",
-                    "action": "ScrollWheel",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "3f378042-6787-481c-8f3e-6a563562b529",
                     "path": "<Mouse>/leftButton",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "LeftClick",
+                    "action": "MoveCharacterToSelectedPosition",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -884,7 +855,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "LeftClick",
+                    "action": "MoveCharacterToSelectedPosition",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -895,7 +866,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Touch",
-                    "action": "LeftClick",
+                    "action": "MoveCharacterToSelectedPosition",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -906,40 +877,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "XR",
-                    "action": "LeftClick",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "fd975b3e-da2b-4182-bc9b-2550a912f713",
-                    "path": "<Mouse>/position",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard&Mouse",
-                    "action": "Point",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "024c0d4d-0af8-4a07-8393-486acd94f75a",
-                    "path": "<Pen>/position",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard&Mouse",
-                    "action": "Point",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "3a730eaa-e845-41cb-9e84-d7fb380e7439",
-                    "path": "<Touchscreen>/touch*/position",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Touch",
-                    "action": "Point",
+                    "action": "MoveCharacterToSelectedPosition",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -970,7 +908,16 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "CameraRotationAxis",
+                    "name": "Point",
+                    "type": "PassThrough",
+                    "id": "2544ea0c-e846-4393-97ca-13f7cde1242d",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "CameraRotationDelta",
                     "type": "PassThrough",
                     "id": "2f27ef59-a8f0-44c0-a10d-559c8196bda2",
                     "expectedControlType": "Vector2",
@@ -1047,19 +994,52 @@
                 },
                 {
                     "name": "",
+                    "id": "acaceed5-df54-4c0f-8c2c-cf7901ea9606",
+                    "path": "<Mouse>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Point",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a4372900-0af1-47ff-9e19-d84f78e10a90",
+                    "path": "<Pen>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Point",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "cfd3f35e-bc54-40c5-b77e-72533ad1372b",
+                    "path": "<Touchscreen>/touch*/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Touch",
+                    "action": "Point",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "07255094-1f6e-4b3d-84d5-2236a8c0f9df",
                     "path": "<Mouse>/delta",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "CameraRotationAxis",
+                    "action": "CameraRotationDelta",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
                     "id": "309263cf-64e1-40ab-980e-71cce37d8cc8",
-                    "path": "<Mouse>/leftButton",
+                    "path": "<Mouse>/middleButton",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",

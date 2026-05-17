@@ -866,16 +866,7 @@ namespace UnityEngine.InputSystem
             ""id"": ""5b58700f-9612-42cc-b828-586d77755b0f"",
             ""actions"": [
                 {
-                    ""name"": ""Point"",
-                    ""type"": ""PassThrough"",
-                    ""id"": ""9f3bfcc5-e168-4451-8de1-5feb2c1a18db"",
-                    ""expectedControlType"": ""Vector2"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": true
-                },
-                {
-                    ""name"": ""LeftClick"",
+                    ""name"": ""MoveCharacterToSelectedPosition"",
                     ""type"": ""PassThrough"",
                     ""id"": ""3ff5df96-9ead-4a8b-88ee-1c8cc875f66a"",
                     ""expectedControlType"": ""Button"",
@@ -897,15 +888,6 @@ namespace UnityEngine.InputSystem
                     ""type"": ""PassThrough"",
                     ""id"": ""fa052ec0-89fa-4560-a4d3-079c78b27174"",
                     ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""ScrollWheel"",
-                    ""type"": ""PassThrough"",
-                    ""id"": ""be4be1fb-c5c5-4ad3-96c5-d46903c707b9"",
-                    ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -945,23 +927,12 @@ namespace UnityEngine.InputSystem
                 },
                 {
                     ""name"": """",
-                    ""id"": ""23407d75-84cd-4006-af86-07951b34e954"",
-                    ""path"": ""<Mouse>/scroll"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""ScrollWheel"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""3f378042-6787-481c-8f3e-6a563562b529"",
                     ""path"": ""<Mouse>/leftButton"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""LeftClick"",
+                    ""action"": ""MoveCharacterToSelectedPosition"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -972,7 +943,7 @@ namespace UnityEngine.InputSystem
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""LeftClick"",
+                    ""action"": ""MoveCharacterToSelectedPosition"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -983,7 +954,7 @@ namespace UnityEngine.InputSystem
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Touch"",
-                    ""action"": ""LeftClick"",
+                    ""action"": ""MoveCharacterToSelectedPosition"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -994,40 +965,7 @@ namespace UnityEngine.InputSystem
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""XR"",
-                    ""action"": ""LeftClick"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""fd975b3e-da2b-4182-bc9b-2550a912f713"",
-                    ""path"": ""<Mouse>/position"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Point"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""024c0d4d-0af8-4a07-8393-486acd94f75a"",
-                    ""path"": ""<Pen>/position"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Point"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""3a730eaa-e845-41cb-9e84-d7fb380e7439"",
-                    ""path"": ""<Touchscreen>/touch*/position"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Touch"",
-                    ""action"": ""Point"",
+                    ""action"": ""MoveCharacterToSelectedPosition"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1058,7 +996,16 @@ namespace UnityEngine.InputSystem
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""CameraRotationAxis"",
+                    ""name"": ""Point"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""2544ea0c-e846-4393-97ca-13f7cde1242d"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""CameraRotationDelta"",
                     ""type"": ""PassThrough"",
                     ""id"": ""2f27ef59-a8f0-44c0-a10d-559c8196bda2"",
                     ""expectedControlType"": ""Vector2"",
@@ -1135,19 +1082,52 @@ namespace UnityEngine.InputSystem
                 },
                 {
                     ""name"": """",
+                    ""id"": ""acaceed5-df54-4c0f-8c2c-cf7901ea9606"",
+                    ""path"": ""<Mouse>/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Point"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a4372900-0af1-47ff-9e19-d84f78e10a90"",
+                    ""path"": ""<Pen>/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Point"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""cfd3f35e-bc54-40c5-b77e-72533ad1372b"",
+                    ""path"": ""<Touchscreen>/touch*/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Touch"",
+                    ""action"": ""Point"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""07255094-1f6e-4b3d-84d5-2236a8c0f9df"",
                     ""path"": ""<Mouse>/delta"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""CameraRotationAxis"",
+                    ""action"": ""CameraRotationDelta"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
                     ""id"": ""309263cf-64e1-40ab-980e-71cce37d8cc8"",
-                    ""path"": ""<Mouse>/leftButton"",
+                    ""path"": ""<Mouse>/middleButton"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
@@ -1328,16 +1308,15 @@ namespace UnityEngine.InputSystem
             m_UI_TrackedDeviceOrientation = m_UI.FindAction("TrackedDeviceOrientation", throwIfNotFound: true);
             // TacticalGame
             m_TacticalGame = asset.FindActionMap("TacticalGame", throwIfNotFound: true);
-            m_TacticalGame_Point = m_TacticalGame.FindAction("Point", throwIfNotFound: true);
-            m_TacticalGame_LeftClick = m_TacticalGame.FindAction("LeftClick", throwIfNotFound: true);
+            m_TacticalGame_MoveCharacterToSelectedPosition = m_TacticalGame.FindAction("MoveCharacterToSelectedPosition", throwIfNotFound: true);
             m_TacticalGame_RightClick = m_TacticalGame.FindAction("RightClick", throwIfNotFound: true);
             m_TacticalGame_MiddleClick = m_TacticalGame.FindAction("MiddleClick", throwIfNotFound: true);
-            m_TacticalGame_ScrollWheel = m_TacticalGame.FindAction("ScrollWheel", throwIfNotFound: true);
             m_TacticalGame_Exit = m_TacticalGame.FindAction("Exit", throwIfNotFound: true);
             // CameraMovement
             m_CameraMovement = asset.FindActionMap("CameraMovement", throwIfNotFound: true);
             m_CameraMovement_Up = m_CameraMovement.FindAction("Up", throwIfNotFound: true);
-            m_CameraMovement_CameraRotationAxis = m_CameraMovement.FindAction("CameraRotationAxis", throwIfNotFound: true);
+            m_CameraMovement_Point = m_CameraMovement.FindAction("Point", throwIfNotFound: true);
+            m_CameraMovement_CameraRotationDelta = m_CameraMovement.FindAction("CameraRotationDelta", throwIfNotFound: true);
             m_CameraMovement_CameraButton = m_CameraMovement.FindAction("CameraButton", throwIfNotFound: true);
             m_CameraMovement_Down = m_CameraMovement.FindAction("Down", throwIfNotFound: true);
             m_CameraMovement_Forward = m_CameraMovement.FindAction("Forward", throwIfNotFound: true);
@@ -1740,11 +1719,9 @@ namespace UnityEngine.InputSystem
         // TacticalGame
         private readonly InputActionMap m_TacticalGame;
         private List<ITacticalGameActions> m_TacticalGameActionsCallbackInterfaces = new List<ITacticalGameActions>();
-        private readonly InputAction m_TacticalGame_Point;
-        private readonly InputAction m_TacticalGame_LeftClick;
+        private readonly InputAction m_TacticalGame_MoveCharacterToSelectedPosition;
         private readonly InputAction m_TacticalGame_RightClick;
         private readonly InputAction m_TacticalGame_MiddleClick;
-        private readonly InputAction m_TacticalGame_ScrollWheel;
         private readonly InputAction m_TacticalGame_Exit;
         /// <summary>
         /// Provides access to input actions defined in input action map "TacticalGame".
@@ -1758,13 +1735,9 @@ namespace UnityEngine.InputSystem
             /// </summary>
             public TacticalGameActions(@TacticalGameInputActions wrapper) { m_Wrapper = wrapper; }
             /// <summary>
-            /// Provides access to the underlying input action "TacticalGame/Point".
+            /// Provides access to the underlying input action "TacticalGame/MoveCharacterToSelectedPosition".
             /// </summary>
-            public InputAction @Point => m_Wrapper.m_TacticalGame_Point;
-            /// <summary>
-            /// Provides access to the underlying input action "TacticalGame/LeftClick".
-            /// </summary>
-            public InputAction @LeftClick => m_Wrapper.m_TacticalGame_LeftClick;
+            public InputAction @MoveCharacterToSelectedPosition => m_Wrapper.m_TacticalGame_MoveCharacterToSelectedPosition;
             /// <summary>
             /// Provides access to the underlying input action "TacticalGame/RightClick".
             /// </summary>
@@ -1773,10 +1746,6 @@ namespace UnityEngine.InputSystem
             /// Provides access to the underlying input action "TacticalGame/MiddleClick".
             /// </summary>
             public InputAction @MiddleClick => m_Wrapper.m_TacticalGame_MiddleClick;
-            /// <summary>
-            /// Provides access to the underlying input action "TacticalGame/ScrollWheel".
-            /// </summary>
-            public InputAction @ScrollWheel => m_Wrapper.m_TacticalGame_ScrollWheel;
             /// <summary>
             /// Provides access to the underlying input action "TacticalGame/Exit".
             /// </summary>
@@ -1807,21 +1776,15 @@ namespace UnityEngine.InputSystem
             {
                 if (instance == null || m_Wrapper.m_TacticalGameActionsCallbackInterfaces.Contains(instance)) return;
                 m_Wrapper.m_TacticalGameActionsCallbackInterfaces.Add(instance);
-                @Point.started += instance.OnPoint;
-                @Point.performed += instance.OnPoint;
-                @Point.canceled += instance.OnPoint;
-                @LeftClick.started += instance.OnLeftClick;
-                @LeftClick.performed += instance.OnLeftClick;
-                @LeftClick.canceled += instance.OnLeftClick;
+                @MoveCharacterToSelectedPosition.started += instance.OnMoveCharacterToSelectedPosition;
+                @MoveCharacterToSelectedPosition.performed += instance.OnMoveCharacterToSelectedPosition;
+                @MoveCharacterToSelectedPosition.canceled += instance.OnMoveCharacterToSelectedPosition;
                 @RightClick.started += instance.OnRightClick;
                 @RightClick.performed += instance.OnRightClick;
                 @RightClick.canceled += instance.OnRightClick;
                 @MiddleClick.started += instance.OnMiddleClick;
                 @MiddleClick.performed += instance.OnMiddleClick;
                 @MiddleClick.canceled += instance.OnMiddleClick;
-                @ScrollWheel.started += instance.OnScrollWheel;
-                @ScrollWheel.performed += instance.OnScrollWheel;
-                @ScrollWheel.canceled += instance.OnScrollWheel;
                 @Exit.started += instance.OnExit;
                 @Exit.performed += instance.OnExit;
                 @Exit.canceled += instance.OnExit;
@@ -1836,21 +1799,15 @@ namespace UnityEngine.InputSystem
             /// <seealso cref="TacticalGameActions" />
             private void UnregisterCallbacks(ITacticalGameActions instance)
             {
-                @Point.started -= instance.OnPoint;
-                @Point.performed -= instance.OnPoint;
-                @Point.canceled -= instance.OnPoint;
-                @LeftClick.started -= instance.OnLeftClick;
-                @LeftClick.performed -= instance.OnLeftClick;
-                @LeftClick.canceled -= instance.OnLeftClick;
+                @MoveCharacterToSelectedPosition.started -= instance.OnMoveCharacterToSelectedPosition;
+                @MoveCharacterToSelectedPosition.performed -= instance.OnMoveCharacterToSelectedPosition;
+                @MoveCharacterToSelectedPosition.canceled -= instance.OnMoveCharacterToSelectedPosition;
                 @RightClick.started -= instance.OnRightClick;
                 @RightClick.performed -= instance.OnRightClick;
                 @RightClick.canceled -= instance.OnRightClick;
                 @MiddleClick.started -= instance.OnMiddleClick;
                 @MiddleClick.performed -= instance.OnMiddleClick;
                 @MiddleClick.canceled -= instance.OnMiddleClick;
-                @ScrollWheel.started -= instance.OnScrollWheel;
-                @ScrollWheel.performed -= instance.OnScrollWheel;
-                @ScrollWheel.canceled -= instance.OnScrollWheel;
                 @Exit.started -= instance.OnExit;
                 @Exit.performed -= instance.OnExit;
                 @Exit.canceled -= instance.OnExit;
@@ -1892,7 +1849,8 @@ namespace UnityEngine.InputSystem
         private readonly InputActionMap m_CameraMovement;
         private List<ICameraMovementActions> m_CameraMovementActionsCallbackInterfaces = new List<ICameraMovementActions>();
         private readonly InputAction m_CameraMovement_Up;
-        private readonly InputAction m_CameraMovement_CameraRotationAxis;
+        private readonly InputAction m_CameraMovement_Point;
+        private readonly InputAction m_CameraMovement_CameraRotationDelta;
         private readonly InputAction m_CameraMovement_CameraButton;
         private readonly InputAction m_CameraMovement_Down;
         private readonly InputAction m_CameraMovement_Forward;
@@ -1915,9 +1873,13 @@ namespace UnityEngine.InputSystem
             /// </summary>
             public InputAction @Up => m_Wrapper.m_CameraMovement_Up;
             /// <summary>
-            /// Provides access to the underlying input action "CameraMovement/CameraRotationAxis".
+            /// Provides access to the underlying input action "CameraMovement/Point".
             /// </summary>
-            public InputAction @CameraRotationAxis => m_Wrapper.m_CameraMovement_CameraRotationAxis;
+            public InputAction @Point => m_Wrapper.m_CameraMovement_Point;
+            /// <summary>
+            /// Provides access to the underlying input action "CameraMovement/CameraRotationDelta".
+            /// </summary>
+            public InputAction @CameraRotationDelta => m_Wrapper.m_CameraMovement_CameraRotationDelta;
             /// <summary>
             /// Provides access to the underlying input action "CameraMovement/CameraButton".
             /// </summary>
@@ -1971,9 +1933,12 @@ namespace UnityEngine.InputSystem
                 @Up.started += instance.OnUp;
                 @Up.performed += instance.OnUp;
                 @Up.canceled += instance.OnUp;
-                @CameraRotationAxis.started += instance.OnCameraRotationAxis;
-                @CameraRotationAxis.performed += instance.OnCameraRotationAxis;
-                @CameraRotationAxis.canceled += instance.OnCameraRotationAxis;
+                @Point.started += instance.OnPoint;
+                @Point.performed += instance.OnPoint;
+                @Point.canceled += instance.OnPoint;
+                @CameraRotationDelta.started += instance.OnCameraRotationDelta;
+                @CameraRotationDelta.performed += instance.OnCameraRotationDelta;
+                @CameraRotationDelta.canceled += instance.OnCameraRotationDelta;
                 @CameraButton.started += instance.OnCameraButton;
                 @CameraButton.performed += instance.OnCameraButton;
                 @CameraButton.canceled += instance.OnCameraButton;
@@ -2006,9 +1971,12 @@ namespace UnityEngine.InputSystem
                 @Up.started -= instance.OnUp;
                 @Up.performed -= instance.OnUp;
                 @Up.canceled -= instance.OnUp;
-                @CameraRotationAxis.started -= instance.OnCameraRotationAxis;
-                @CameraRotationAxis.performed -= instance.OnCameraRotationAxis;
-                @CameraRotationAxis.canceled -= instance.OnCameraRotationAxis;
+                @Point.started -= instance.OnPoint;
+                @Point.performed -= instance.OnPoint;
+                @Point.canceled -= instance.OnPoint;
+                @CameraRotationDelta.started -= instance.OnCameraRotationDelta;
+                @CameraRotationDelta.performed -= instance.OnCameraRotationDelta;
+                @CameraRotationDelta.canceled -= instance.OnCameraRotationDelta;
                 @CameraButton.started -= instance.OnCameraButton;
                 @CameraButton.performed -= instance.OnCameraButton;
                 @CameraButton.canceled -= instance.OnCameraButton;
@@ -2240,19 +2208,12 @@ namespace UnityEngine.InputSystem
         public interface ITacticalGameActions
         {
             /// <summary>
-            /// Method invoked when associated input action "Point" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "MoveCharacterToSelectedPosition" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-            void OnPoint(InputAction.CallbackContext context);
-            /// <summary>
-            /// Method invoked when associated input action "LeftClick" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-            /// </summary>
-            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-            void OnLeftClick(InputAction.CallbackContext context);
+            void OnMoveCharacterToSelectedPosition(InputAction.CallbackContext context);
             /// <summary>
             /// Method invoked when associated input action "RightClick" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
@@ -2267,13 +2228,6 @@ namespace UnityEngine.InputSystem
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnMiddleClick(InputAction.CallbackContext context);
-            /// <summary>
-            /// Method invoked when associated input action "ScrollWheel" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-            /// </summary>
-            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-            void OnScrollWheel(InputAction.CallbackContext context);
             /// <summary>
             /// Method invoked when associated input action "Exit" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
@@ -2297,12 +2251,19 @@ namespace UnityEngine.InputSystem
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnUp(InputAction.CallbackContext context);
             /// <summary>
-            /// Method invoked when associated input action "CameraRotationAxis" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "Point" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-            void OnCameraRotationAxis(InputAction.CallbackContext context);
+            void OnPoint(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "CameraRotationDelta" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnCameraRotationDelta(InputAction.CallbackContext context);
             /// <summary>
             /// Method invoked when associated input action "CameraButton" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
