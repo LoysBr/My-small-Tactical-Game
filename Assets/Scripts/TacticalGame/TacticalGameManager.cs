@@ -18,9 +18,17 @@ public class TacticalGameManager : MonoBehaviour
         Initialize();
     }
 
+    private void Initialize()
+    {
+        m_TacticalGameMovementMap = InputSystem.actions.FindActionMap("TacticalGame");
+        m_TacticalGameMovementMap.Enable();
+
+        m_GroundStrategy = m_GroundController; //TODO : pattern Service Locator 
+        MyLogger.Init();
+    }
+
     private void OnDestroy()
     {
-        Debug.Log("TacticalGameManager OnDestroy");
         if (m_PlayerController)
         {
             m_PlayerController.MoveCharacterToSelectedPositionEvent -= PlayerController_OnMoveCharacterToSelectedPosition;
@@ -31,39 +39,9 @@ public class TacticalGameManager : MonoBehaviour
         GC.Collect();
     }
 
-    private void Initialize()
-    {
-        m_TacticalGameMovementMap = InputSystem.actions.FindActionMap("TacticalGame");
-        m_TacticalGameMovementMap.Enable();
-
-        m_GroundStrategy = m_GroundController; //TODO : pattern Service Locator 
-    }
-
     private void Start()
     {
         m_PlayerController.MoveCharacterToSelectedPositionEvent += PlayerController_OnMoveCharacterToSelectedPosition;
-
-        Timer testTimer = TimerManager.CreateTimer(3f);
-        testTimer.StartEvent += OnTimerStart;
-        testTimer.StopEvent += OnTimerStop;
-        testTimer.ElapsedEvent += OnTimerElapsed;
-        testTimer.AutoRestart = false;
-        testTimer.Start();
-    }
-
-    private void OnTimerElapsed()
-    {
-        Debug.Log("OnTimerElapsed");
-    }
-
-    private void OnTimerStop()
-    {
-        Debug.Log("OnTimerStop");
-    }
-
-    private void OnTimerStart()
-    {
-        Debug.Log("OnTimerStart");
     }
 
     private void PlayerController_OnMoveCharacterToSelectedPosition()

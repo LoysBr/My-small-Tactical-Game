@@ -7,6 +7,12 @@ using System;
 //Then if you store a reference to it in your Class, don't forget to dereference it after using it.
 //Normally you don't need to reference it, you can simply listen to his events Elapsed, Stop and Start
 //The TimerManager only keeps references to Running Timers. 
+
+//Usage example :
+//Timer testTimer = TimerManager.CreateTimer(3f);
+//testTimer.ElapsedEvent += OnTimerElapsed;
+//testTimer.AutoRestart = false;
+//testTimer.Start();
 public static class TimerManager
 {
     private static List<Timer> _timers = null;
@@ -59,12 +65,10 @@ public static class TimerManager
         foreach (Timer timerToRemove in _timersRemoveBuffer)
         {
             timerToRemove.IsRunning = false;
-            Debug.Log("TimerManager update =>  _timers.Remove");
             _timers.Remove(timerToRemove);
         }
         foreach (Timer timerToAdd in _timersAddBuffer)
         {
-            Debug.Log("TimerManager update =>  _timers.Add");
             _timers.Add(timerToAdd);
         }
         _timersAddBuffer.Clear();
@@ -101,19 +105,16 @@ public static class TimerManager
 
     private static void OnEventStop(Timer timer)
     {
-        Debug.Log("TimerManager OnEventStop");
         RemoveTimer(timer);
     }
 
     private static void OnEventStart(Timer timer)
     {
-        Debug.Log("TimerManager OnEventStart");
         StartTimer(timer);
     }
 
     private static void StartTimer(Timer timer)
     {
-        Debug.Log("TimerManager.StartTimer");
         if (_timers == null)
         {
             _timers = new List<Timer>();
@@ -144,7 +145,6 @@ public static class TimerManager
 
     private static void RemoveTimer(Timer timer)
     {
-        Debug.Log("TimerManager.RemoveTimer");
         if (timer != null)
         {
             if (!_timersRemoveBuffer.Contains(timer))
