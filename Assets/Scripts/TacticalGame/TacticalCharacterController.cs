@@ -15,6 +15,8 @@ public class TacticalCharacterController : MonoBehaviour
     {
         StopMoving();
         m_SqrStopTargetDistance = m_StopTargetDistance * m_StopTargetDistance;
+
+        m_Animator.speed = m_WalkSpeed;
     }
 
     public void MoveCharacterToSelectedPosition(Vector3 moveToPosition)

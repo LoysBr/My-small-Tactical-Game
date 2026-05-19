@@ -13,19 +13,21 @@ public class TacticalGameManager : MonoBehaviour
     
     private ITacticalGroundStrategy m_GroundStrategy; //TODO : pattern Service Locator 
 
-    void OnEnable()
+    private void OnEnable()
     {
         Initialize();
     }
 
     private void OnDestroy()
     {
+        Debug.Log("TacticalGameManager OnDestroy");
         if (m_PlayerController)
         {
             m_PlayerController.MoveCharacterToSelectedPositionEvent -= PlayerController_OnMoveCharacterToSelectedPosition;
         }
 
         m_PlayerController = null;
+        TimerManager.ClearReferences();
         GC.Collect();
     }
 
@@ -40,6 +42,28 @@ public class TacticalGameManager : MonoBehaviour
     private void Start()
     {
         m_PlayerController.MoveCharacterToSelectedPositionEvent += PlayerController_OnMoveCharacterToSelectedPosition;
+
+        Timer testTimer = TimerManager.CreateTimer(3f);
+        testTimer.StartEvent += OnTimerStart;
+        testTimer.StopEvent += OnTimerStop;
+        testTimer.ElapsedEvent += OnTimerElapsed;
+        testTimer.AutoRestart = false;
+        testTimer.Start();
+    }
+
+    private void OnTimerElapsed()
+    {
+        Debug.Log("OnTimerElapsed");
+    }
+
+    private void OnTimerStop()
+    {
+        Debug.Log("OnTimerStop");
+    }
+
+    private void OnTimerStart()
+    {
+        Debug.Log("OnTimerStart");
     }
 
     private void PlayerController_OnMoveCharacterToSelectedPosition()
@@ -50,6 +74,8 @@ public class TacticalGameManager : MonoBehaviour
 
     private void Update()
     {
+        TimerManager.Update(Time.deltaTime);
+
         //TODO : "if We Are Currently Selecting A Character and Moving A Cursor to Move Character there"
         m_GroundStrategy.IndicateCharacterGroundLocation(m_CameraController.GetPointerScreenToRay(), ITacticalGroundStrategy.IndicationType.MovementPreview);
     }
