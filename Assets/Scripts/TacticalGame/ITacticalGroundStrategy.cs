@@ -13,4 +13,6 @@ public interface ITacticalGroundStrategy
     /// Give a feedback about a ground Position for a Character
     /// </summary>
     public Vector3 IndicateCharacterGroundLocation(Ray screenPointToRay, IndicationType indicationType);
+
+    public Vector3 GetRandomGroundLocation();
 }

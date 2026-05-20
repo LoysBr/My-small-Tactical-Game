@@ -22,7 +22,7 @@ public class Grid
     /// <summary>
     /// Ajoute un ennemi dans le QuadTree.
     /// </summary>
-    public bool AddEnemy(EnemyController enemy)
+    public bool AddEnemy(EnemyModel enemy)
     {
         Vector3 pos = enemy.Position;
         Vector2 point = new Vector2(pos.x, pos.z);
@@ -33,7 +33,7 @@ public class Grid
     /// <summary>
     /// Supprime un ennemi du QuadTree.
     /// </summary>
-    public bool RemoveEnemy(EnemyController enemy)
+    public bool RemoveEnemy(EnemyModel enemy)
     {
         return m_Root.Remove(enemy);
     }
@@ -56,7 +56,7 @@ public class QuadTreeNode
 
     public Rect m_Bounds;
 
-    private EnemyController m_StoredEnemy;
+    private EnemyModel m_StoredEnemy;
     private bool m_HasEnemy;
     private QuadTreeNode[] m_Children;
     private int m_Depth;
@@ -69,7 +69,7 @@ public class QuadTreeNode
 
     public bool IsLeaf => m_Children == null;
 
-    public bool Insert(EnemyController enemy, Vector2 point)
+    public bool Insert(EnemyModel enemy, Vector2 point)
     {
         if (!m_Bounds.Contains(point))
             return false;
@@ -95,7 +95,7 @@ public class QuadTreeNode
             Vector3 oldPos = m_StoredEnemy.Position;
             Vector2 oldPoint = new Vector2(oldPos.x, oldPos.z);
 
-            EnemyController oldEnemy = m_StoredEnemy;
+            EnemyModel oldEnemy = m_StoredEnemy;
 
             m_StoredEnemy = null;
             m_HasEnemy = false;
@@ -106,7 +106,7 @@ public class QuadTreeNode
         return InsertIntoChildren(enemy, point);
     }
 
-    private bool InsertIntoChildren(EnemyController enemy, Vector2 point)
+    private bool InsertIntoChildren(EnemyModel enemy, Vector2 point)
     {
         foreach (var child in m_Children)
         {
@@ -117,7 +117,7 @@ public class QuadTreeNode
         return false;
     }
 
-    public bool Remove(EnemyController enemy)
+    public bool Remove(EnemyModel enemy)
     {
         // Cas feuille
         if (IsLeaf)

@@ -10,6 +10,14 @@ public class BG3TacticalGroundController : MonoBehaviour, ITacticalGroundStrateg
 
     private Coroutine m_HidingCharMovementConfirmation;
 
+    // public Rect m_GroundPlaneBounds;
+    private PlaneBounds m_PlaneBounds;
+
+    private void Start()
+    {
+        m_PlaneBounds = GetComponent<PlaneBounds>();
+    }
+
     public Vector3 IndicateCharacterGroundLocation(Ray screenPointToRay, ITacticalGroundStrategy.IndicationType indicationType)
     {
         if (Physics.Raycast(screenPointToRay, out RaycastHit hitInfo, 1000f, m_TacticalGridLayer))
@@ -57,4 +65,28 @@ public class BG3TacticalGroundController : MonoBehaviour, ITacticalGroundStrateg
         m_HidingCharMovementConfirmation = null;
         yield return null;
     }
+
+    public Vector3 GetRandomGroundLocation()
+    {
+        return m_PlaneBounds.GetRandomPlanePointInsideBounds();
+    }
+
+    ///// <summary>
+    ///// Computes the plane bounds using the Renderer bounds. Plane must have an orientation of 0°
+    ///// </summary>
+    //public void UpdateGroundPlaneBounds()
+    //{
+    //    Renderer renderer = GetComponent<Renderer>();
+
+    //    //Warnin : this works only because our Plane has an orientation of 0°, since Bounds == AABB Axis-Aligned Bounding Box
+    //    Bounds bounds = renderer.bounds;
+
+    //    // Convert Unity Bounds (3D) into Rect (2D XZ space)
+    //    m_GroundPlaneBounds = new Rect(
+    //        bounds.min.x,
+    //        bounds.min.z,
+    //        bounds.size.x,
+    //        bounds.size.z
+    //    );
+    //}
 }

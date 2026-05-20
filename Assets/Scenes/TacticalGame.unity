@@ -259,6 +259,7 @@ GameObject:
   - component: {fileID: 164313259}
   - component: {fileID: 164313258}
   - component: {fileID: 164313262}
+  - component: {fileID: 164313263}
   m_Layer: 14
   m_Name: TacticalGround
   m_TagString: Untagged
@@ -380,6 +381,18 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 16384
   m_CharMovementConfirmationShowedDuration: 1.5
+--- !u!114 &164313263
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 164313257}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1b760ee716fb7b438cd8990dc08d05f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlaneBounds
 --- !u!1 &234216539
 GameObject:
   m_ObjectHideFlags: 0
@@ -503,9 +516,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d23e846849dfdf44fa9804806c214be4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  m_EnemyPrefab: {fileID: 0}
   m_SpawnCount: 0
   m_SpawnDelay: 0
+  m_EnemyPrefab: {fileID: 152579157399328630, guid: f123e61ea85010b4fa8a39c35c5a0186, type: 3}
+  m_InitialPoolSize: 32
+  m_PoolParent: {fileID: 2085416308}
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -890,6 +905,7 @@ MonoBehaviour:
   m_CameraController: {fileID: 330585548}
   m_GroundController: {fileID: 164313262}
   m_PlayerController: {fileID: 1150846112}
+  m_EnemySpawner: {fileID: 278894696}
 --- !u!1 &787390300
 GameObject:
   m_ObjectHideFlags: 0
@@ -1407,7 +1423,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 629340566395628792, guid: 1fd4a1b6079c0a7408eed449e315e2eb, type: 3}
       propertyPath: m_Name
-      value: SkeletonTactical
+      value: Player
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1425,6 +1441,10 @@ PrefabInstance:
     - target: {fileID: 2313587773186322514, guid: f123e61ea85010b4fa8a39c35c5a0186, type: 3}
       propertyPath: m_Name
       value: Enemy
+      objectReference: {fileID: 0}
+    - target: {fileID: 2313587773186322514, guid: f123e61ea85010b4fa8a39c35c5a0186, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3121086346622757608, guid: f123e61ea85010b4fa8a39c35c5a0186, type: 3}
       propertyPath: m_LocalPosition.x

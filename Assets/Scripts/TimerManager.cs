@@ -21,9 +21,9 @@ public static class TimerManager
 
     public static void ClearReferences()
     {
-        _timers.Clear();
-        _timersAddBuffer.Clear();
-        _timersRemoveBuffer.Clear();
+        _timers?.Clear();
+        _timersAddBuffer?.Clear();
+        _timersRemoveBuffer?.Clear();
     }
 
     public static Timer CreateTimer()
