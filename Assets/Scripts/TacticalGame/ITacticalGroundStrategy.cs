@@ -9,6 +9,10 @@ public interface ITacticalGroundStrategy
         MovementConfirmation,
     }
 
+    public void AddEnemy(EnemyModel enemy);
+
+    public void RemoveEnemy(EnemyModel enemy);
+
     /// <summary>
     /// Give a feedback about a ground Position for a Character
     /// </summary>

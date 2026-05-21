@@ -21,7 +21,17 @@ public class BG3TacticalGroundController : MonoBehaviour, ITacticalGroundStrateg
     private void Awake()
     {
         m_PlaneBounds = GetComponent<PlaneBounds>();
-        m_EnemyDensityManagementGrid = new QuadTreeGrid(10, 4);
+        m_EnemyDensityManagementGrid = new QuadTreeGrid(20, 32);
+    }
+
+    public void AddEnemy(EnemyModel enemy)
+    {
+        m_EnemyDensityManagementGrid.AddEnemy(enemy);
+    }
+
+    public void RemoveEnemy(EnemyModel enemy)
+    {
+        m_EnemyDensityManagementGrid.RemoveEnemy(enemy);
     }
 
     public Vector3 IndicateCharacterGroundLocation(Ray screenPointToRay, ITacticalGroundStrategy.IndicationType indicationType)
@@ -75,6 +85,14 @@ public class BG3TacticalGroundController : MonoBehaviour, ITacticalGroundStrateg
     public Vector3 GetRandomGroundLocation()
     {
         return m_PlaneBounds.GetRandomPlanePointInsideBounds();
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (m_EnemyDensityManagementGrid == null)
+            return;
+
+        m_EnemyDensityManagementGrid.DrawDebug();
     }
 
     ///// <summary>

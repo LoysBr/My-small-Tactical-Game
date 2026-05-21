@@ -45,9 +45,9 @@ public class TacticalGameManager : MonoBehaviour
         m_PlayerController.MoveCharacterToSelectedPositionEvent += PlayerController_OnMoveCharacterToSelectedPosition;
 
         //TEST SPAWN ENEMIES
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 20; i++)
         {
-            m_EnemySpawner.CreateEnemy(m_Ground.GetRandomGroundLocation());
+            m_Ground.AddEnemy(m_EnemySpawner.CreateEnemy(m_Ground.GetRandomGroundLocation()));
         }
         //////TEST SPAWN ENEMIES END
     }

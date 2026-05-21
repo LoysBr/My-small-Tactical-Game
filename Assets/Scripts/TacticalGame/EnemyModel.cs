@@ -9,5 +9,6 @@ public class EnemyModel
     public EnemyModel(EnemyPresenter presenter)
     {  
         m_Presenter = presenter;
+        Position = presenter.transform.position;
     }
 }

@@ -31,7 +31,10 @@ public class QuadTreeGrid
         Vector3 pos = enemy.Position;
         Vector2 point = new Vector2(pos.x, pos.z);
 
-        return m_Root.Insert(enemy, point);
+        bool enemyIsInsideRoot = m_Root.Insert(enemy, point);
+        if (!enemyIsInsideRoot)
+            MyLogger.Log($"Grid Insert Enemy Pos : {point.x}, {point.y} => ROOT does NOT contain it ???!!!", MyLogger.LogLevel.Error);
+        return enemyIsInsideRoot;
     }
 
     /// <summary>
@@ -51,6 +54,23 @@ public class QuadTreeGrid
         m_Root.CollectLargestEmptyCells(result);
         return result;
     }
+
+    #region Debug Drawing
+
+    /// <summary>
+    /// Draws the entire QuadTree using Gizmos.
+    /// </summary>
+    public void DrawDebug()
+    {
+        if (m_Root == null)
+            return;
+
+        Gizmos.color = Color.cyan;
+
+        m_Root.DrawDebug();
+    }
+
+    #endregion
 }
 
 
@@ -246,4 +266,43 @@ public class QuadTreeNode
             child.CollectLargestEmptyCells(result);
         }
     }
+
+    #region Debug Drawing
+
+    /// <summary>
+    /// Draws only leaf nodes recursively.
+    /// </summary>
+    public void DrawDebug()
+    {
+        // Draw only leaves
+        if (IsLeaf)
+        {
+            DrawRect(m_Bounds);
+            return;
+        }
+
+        // Otherwise recurse into children
+        foreach (QuadTreeNode child in m_Children)
+        {
+            child.DrawDebug();
+        }
+    }
+
+    /// <summary>
+    /// Draws a Rect in XZ space.
+    /// </summary>
+    private void DrawRect(Rect rect)
+    {
+        Vector3 bottomLeft = new Vector3(rect.xMin, 0f, rect.yMin);
+        Vector3 bottomRight = new Vector3(rect.xMax, 0f, rect.yMin);
+        Vector3 topRight = new Vector3(rect.xMax, 0f, rect.yMax);
+        Vector3 topLeft = new Vector3(rect.xMin, 0f, rect.yMax);
+
+        Gizmos.DrawLine(bottomLeft, bottomRight);
+        Gizmos.DrawLine(bottomRight, topRight);
+        Gizmos.DrawLine(topRight, topLeft);
+        Gizmos.DrawLine(topLeft, bottomLeft);
+    }
+
+    #endregion
 }
