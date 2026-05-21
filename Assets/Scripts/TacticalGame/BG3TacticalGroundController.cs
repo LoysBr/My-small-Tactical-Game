@@ -8,14 +8,20 @@ public class BG3TacticalGroundController : MonoBehaviour, ITacticalGroundStrateg
     [SerializeField] private LayerMask m_TacticalGridLayer;
     [SerializeField] private float m_CharMovementConfirmationShowedDuration = 1f;
 
-    private Coroutine m_HidingCharMovementConfirmation;
-
-    // public Rect m_GroundPlaneBounds;
     private PlaneBounds m_PlaneBounds;
 
-    private void Start()
+    /// <summary>
+    /// We use a Grid subdivided in Cells to control the location of the Enemies
+    /// On the Plane and their Density per Cell.
+    /// </summary>
+    private QuadTreeGrid m_EnemyDensityManagementGrid;
+
+    private Coroutine m_HidingCharMovementConfirmation;
+
+    private void Awake()
     {
         m_PlaneBounds = GetComponent<PlaneBounds>();
+        m_EnemyDensityManagementGrid = new QuadTreeGrid(10, 4);
     }
 
     public Vector3 IndicateCharacterGroundLocation(Ray screenPointToRay, ITacticalGroundStrategy.IndicationType indicationType)

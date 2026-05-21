@@ -1,14 +1,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
-public class Grid
+public class QuadTreeGrid
 {
+    private readonly int m_MaxDepth;
+    public int MaxDepth { get { return m_MaxDepth; } }
+
     private QuadTreeNode m_Root;
 
-    public Grid(float worldSize)
+    public QuadTreeGrid(float worldSize, int maxDepth)
     {
         // Centre du monde à (0,0) sur XZ
+        //TODO : change this using real Ground
         Rect worldRect = new Rect(
             -worldSize * 0.5f,
             -worldSize * 0.5f,
@@ -16,7 +19,8 @@ public class Grid
             worldSize
         );
 
-        m_Root = new QuadTreeNode(worldRect);
+        m_MaxDepth = maxDepth;
+        m_Root = new QuadTreeNode(bounds: worldRect, depth: 0, maxDepth: m_MaxDepth);
     }
 
     /// <summary>
@@ -52,7 +56,7 @@ public class Grid
 
 public class QuadTreeNode
 {
-    private const int MAX_DEPTH = 8;
+    private readonly int m_MaxDepth;
 
     public Rect m_Bounds;
 
@@ -61,10 +65,11 @@ public class QuadTreeNode
     private QuadTreeNode[] m_Children;
     private int m_Depth;
 
-    public QuadTreeNode(Rect bounds, int depth = 0)
+    public QuadTreeNode(Rect bounds, int depth, int maxDepth)
     {
         this.m_Bounds = bounds;
         this.m_Depth = depth;
+        this.m_MaxDepth = maxDepth;
     }
 
     public bool IsLeaf => m_Children == null;
@@ -83,7 +88,7 @@ public class QuadTreeNode
         }
 
         // Si profondeur max atteinte
-        if (m_Depth >= MAX_DEPTH)
+        if (m_Depth >= m_MaxDepth)
             return false;
 
         // Si feuille déjà occupée -> subdivision
@@ -197,25 +202,25 @@ public class QuadTreeNode
         // Bas gauche
         m_Children[0] = new QuadTreeNode(
             new Rect(x, y, halfWidth, halfHeight),
-            m_Depth + 1
+            m_Depth + 1, m_MaxDepth
         );
 
         // Bas droite
         m_Children[1] = new QuadTreeNode(
             new Rect(x + halfWidth, y, halfWidth, halfHeight),
-            m_Depth + 1
+            m_Depth + 1, m_MaxDepth
         );
 
         // Haut gauche
         m_Children[2] = new QuadTreeNode(
             new Rect(x, y + halfHeight, halfWidth, halfHeight),
-            m_Depth + 1
+            m_Depth + 1, m_MaxDepth
         );
 
         // Haut droite
         m_Children[3] = new QuadTreeNode(
             new Rect(x + halfWidth, y + halfHeight, halfWidth, halfHeight),
-            m_Depth + 1
+            m_Depth + 1, m_MaxDepth
         );
     }
 
