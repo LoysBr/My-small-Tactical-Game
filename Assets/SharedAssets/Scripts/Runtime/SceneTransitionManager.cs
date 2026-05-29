@@ -17,7 +17,7 @@ public class SceneTransitionManager : MonoBehaviour
 
     private Camera m_MainCamera;
     private Camera m_ScreenCamera;
-    private CharacterController m_Player;
+    private UnityEngine.CharacterController m_Player;
     private PlayerManager m_CameraManager;
 
     private bool m_InitialSceneLoad;
@@ -84,7 +84,7 @@ public class SceneTransitionManager : MonoBehaviour
 
     public void SetupReferences()
     {
-        m_Player = GameObject.Find("PlayerCapsule")?.GetComponent<CharacterController>(); //TODO: Don't hardcode string
+        m_Player = GameObject.Find("PlayerCapsule")?.GetComponent<UnityEngine.CharacterController>(); //TODO: Don't hardcode string
         if (m_Player == null)
         {
             Debug.Log("Couldn't find character controller");
