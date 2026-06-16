@@ -1,5 +1,20 @@
 # C# & Unity Coding Conventions
 
+## Naming Quick Reference
+
+| Member type | Convention | Example |
+|---|---|---|
+| Class / Struct / Enum / Interface | PascalCase | `PlayerController`, `IDamageable` |
+| Public method / property | PascalCase | `GetHealth()`, `Health { get; }` |
+| Private method | PascalCase | `UpdatePosition()` |
+| Private field | m_camelCase | `m_health`, `m_walkSpeed` |
+| Local variable / parameter | camelCase | `enemyCount`, `speed` |
+| Constant | UPPER_SNAKE_CASE | `MAX_SPEED`, `LAYER_MASK` |
+
+> **Critical rule**: `m_` prefix is **exclusively** for private fields. Public members never use it.
+> **Critical rule**: The character immediately after `m_` must be **lowercase** (`m_walkSpeed`, not `m_WalkSpeed`).
+> **Critical rule**: Never use `var` — always write the explicit type.
+
 ## Naming Conventions
 
 ### Classes and Types
@@ -10,13 +25,15 @@
   - `public interface IDamageable`
 
 ### Fields and Variables
-- **camelCase** for local variables and method parameters
+- local variables and method parameters : **camelCase**
   - `int enemyCount = 10;`
   - `float speed = 5f;`
 
-- **m_camelCase** (m + underscore prefix) for private fields
+- private fields: **m_camelCase** (prefix `m_` followed by a **lowercase** first letter)
   - `private int m_health;`
   - `private Transform m_cachedTransform;`
+  - **WRONG**: `private int m_Health;` — the letter after `m_` must be lowercase
+  - **WRONG**: `public int m_health;` — `m_` prefix is ONLY for private fields, never public members
 
 - **UPPER_SNAKE_CASE** for constants
   - `private const float MAX_SPEED = 10f;`
@@ -133,3 +150,6 @@ Order members in this sequence:
 - Use 4 spaces for indentation (standard C# convention)
 - Use blank lines to separate logical sections within methods
 - Keep line length reasonable (under 120 characters when practical)
+
+## Git Commits
+- Never add a "Co-Authored-By" line or any AI attribution to commit messages
