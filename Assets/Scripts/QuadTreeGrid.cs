@@ -3,14 +3,14 @@ using UnityEngine;
 
 public class QuadTreeGrid
 {
-    private readonly int m_MaxDepth;
-    public int MaxDepth { get { return m_MaxDepth; } }
+    private readonly int m_maxDepth;
+    public int MaxDepth { get { return m_maxDepth; } }
 
-    private QuadTreeNode m_Root;
+    private QuadTreeNode m_root;
 
     public QuadTreeGrid(float worldSize, int maxDepth)
     {
-        // Centre du monde à (0,0) sur XZ
+        // Centre du monde ï¿½ (0,0) sur XZ
         //TODO : change this using real Ground
         Rect worldRect = new Rect(
             -worldSize * 0.5f,
@@ -19,8 +19,8 @@ public class QuadTreeGrid
             worldSize
         );
 
-        m_MaxDepth = maxDepth;
-        m_Root = new QuadTreeNode(bounds: worldRect, depth: 0, maxDepth: m_MaxDepth);
+        m_maxDepth = maxDepth;
+        m_root = new QuadTreeNode(bounds: worldRect, depth: 0, maxDepth: m_maxDepth);
     }
 
     /// <summary>
@@ -31,7 +31,7 @@ public class QuadTreeGrid
         Vector3 pos = enemy.Position;
         Vector2 point = new Vector2(pos.x, pos.z);
 
-        bool enemyIsInsideRoot = m_Root.Insert(enemy, point);
+        bool enemyIsInsideRoot = m_root.Insert(enemy, point);
         if (!enemyIsInsideRoot)
             MyLogger.Log($"Grid Insert Enemy Pos : {point.x}, {point.y} => ROOT does NOT contain it ???!!!", MyLogger.LogLevel.Error);
         return enemyIsInsideRoot;
@@ -42,7 +42,12 @@ public class QuadTreeGrid
     /// </summary>
     public bool RemoveEnemy(EnemyModel enemy)
     {
-        return m_Root.Remove(enemy);
+        return m_root.Remove(enemy);
+    }
+
+    public void SetMinimumCellSize(float sizeInMeter)
+    {
+
     }
 
     /// <summary>
@@ -51,7 +56,7 @@ public class QuadTreeGrid
     public List<Rect> GetLargestEmptyCells()
     {
         List<Rect> result = new List<Rect>();
-        m_Root.CollectLargestEmptyCells(result);
+        m_root.CollectLargestEmptyCells(result);
         return result;
     }
 
@@ -62,12 +67,12 @@ public class QuadTreeGrid
     /// </summary>
     public void DrawDebug()
     {
-        if (m_Root == null)
+        if (m_root == null)
             return;
 
         Gizmos.color = Color.cyan;
 
-        m_Root.DrawDebug();
+        m_root.DrawDebug();
     }
 
     #endregion
@@ -76,54 +81,54 @@ public class QuadTreeGrid
 
 public class QuadTreeNode
 {
-    private readonly int m_MaxDepth;
+    private readonly int m_maxDepth;
 
-    public Rect m_Bounds;
+    public Rect Bounds { get; private set; }
 
-    private EnemyModel m_StoredEnemy;
-    private bool m_HasEnemy;
-    private QuadTreeNode[] m_Children;
-    private int m_Depth;
+    private EnemyModel m_storedEnemy;
+    private bool m_hasEnemy;
+    private QuadTreeNode[] m_children;
+    private int m_depth;
 
     public QuadTreeNode(Rect bounds, int depth, int maxDepth)
     {
-        this.m_Bounds = bounds;
-        this.m_Depth = depth;
-        this.m_MaxDepth = maxDepth;
+        this.Bounds = bounds;
+        this.m_depth = depth;
+        this.m_maxDepth = maxDepth;
     }
 
-    public bool IsLeaf => m_Children == null;
+    public bool IsLeaf => m_children == null;
 
     public bool Insert(EnemyModel enemy, Vector2 point)
     {
-        if (!m_Bounds.Contains(point))
+        if (!Bounds.Contains(point))
             return false;
 
         // Si feuille vide
-        if (IsLeaf && !m_HasEnemy)
+        if (IsLeaf && !m_hasEnemy)
         {
-            m_StoredEnemy = enemy;
-            m_HasEnemy = true;
+            m_storedEnemy = enemy;
+            m_hasEnemy = true;
             return true;
         }
 
         // Si profondeur max atteinte
-        if (m_Depth >= m_MaxDepth)
+        if (m_depth >= m_maxDepth)
             return false;
 
-        // Si feuille déjà occupée -> subdivision
+        // Si feuille dï¿½jï¿½ occupï¿½e -> subdivision
         if (IsLeaf)
         {
             Subdivide();
 
-            // Réinjecter ancien ennemi
-            Vector3 oldPos = m_StoredEnemy.Position;
+            // Rï¿½injecter ancien ennemi
+            Vector3 oldPos = m_storedEnemy.Position;
             Vector2 oldPoint = new Vector2(oldPos.x, oldPos.z);
 
-            EnemyModel oldEnemy = m_StoredEnemy;
+            EnemyModel oldEnemy = m_storedEnemy;
 
-            m_StoredEnemy = null;
-            m_HasEnemy = false;
+            m_storedEnemy = null;
+            m_hasEnemy = false;
 
             InsertIntoChildren(oldEnemy, oldPoint);
         }
@@ -133,7 +138,7 @@ public class QuadTreeNode
 
     private bool InsertIntoChildren(EnemyModel enemy, Vector2 point)
     {
-        foreach (var child in m_Children)
+        foreach (QuadTreeNode child in m_children)
         {
             if (child.Insert(enemy, point))
                 return true;
@@ -147,10 +152,10 @@ public class QuadTreeNode
         // Cas feuille
         if (IsLeaf)
         {
-            if (m_HasEnemy && m_StoredEnemy == enemy)
+            if (m_hasEnemy && m_storedEnemy == enemy)
             {
-                m_StoredEnemy = null;
-                m_HasEnemy = false;
+                m_storedEnemy = null;
+                m_hasEnemy = false;
                 return true;
             }
 
@@ -158,7 +163,7 @@ public class QuadTreeNode
         }
 
         // sinon recherche dans enfants
-        foreach (var child in m_Children)
+        foreach (QuadTreeNode child in m_children)
         {
             if (child.Remove(enemy))
             {
@@ -180,7 +185,7 @@ public class QuadTreeNode
 
         bool allEmpty = true;
 
-        foreach (var child in m_Children)
+        foreach (QuadTreeNode child in m_children)
         {
             if (!child.IsCompletelyEmpty())
             {
@@ -191,16 +196,16 @@ public class QuadTreeNode
 
         if (allEmpty)
         {
-            m_Children = null;
+            m_children = null;
         }
     }
 
     public bool IsCompletelyEmpty()
     {
         if (IsLeaf)
-            return !m_HasEnemy;
+            return !m_hasEnemy;
 
-        foreach (var child in m_Children)
+        foreach (QuadTreeNode child in m_children)
         {
             if (!child.IsCompletelyEmpty())
                 return false;
@@ -211,36 +216,36 @@ public class QuadTreeNode
 
     private void Subdivide()
     {
-        m_Children = new QuadTreeNode[4];
+        m_children = new QuadTreeNode[4];
 
-        float halfWidth = m_Bounds.width * 0.5f;
-        float halfHeight = m_Bounds.height * 0.5f;
+        float halfWidth = Bounds.width * 0.5f;
+        float halfHeight = Bounds.height * 0.5f;
 
-        float x = m_Bounds.x;
-        float y = m_Bounds.y;
+        float x = Bounds.x;
+        float y = Bounds.y;
 
         // Bas gauche
-        m_Children[0] = new QuadTreeNode(
+        m_children[0] = new QuadTreeNode(
             new Rect(x, y, halfWidth, halfHeight),
-            m_Depth + 1, m_MaxDepth
+            m_depth + 1, m_maxDepth
         );
 
         // Bas droite
-        m_Children[1] = new QuadTreeNode(
+        m_children[1] = new QuadTreeNode(
             new Rect(x + halfWidth, y, halfWidth, halfHeight),
-            m_Depth + 1, m_MaxDepth
+            m_depth + 1, m_maxDepth
         );
 
         // Haut gauche
-        m_Children[2] = new QuadTreeNode(
+        m_children[2] = new QuadTreeNode(
             new Rect(x, y + halfHeight, halfWidth, halfHeight),
-            m_Depth + 1, m_MaxDepth
+            m_depth + 1, m_maxDepth
         );
 
         // Haut droite
-        m_Children[3] = new QuadTreeNode(
+        m_children[3] = new QuadTreeNode(
             new Rect(x + halfWidth, y + halfHeight, halfWidth, halfHeight),
-            m_Depth + 1, m_MaxDepth
+            m_depth + 1, m_maxDepth
         );
     }
 
@@ -250,18 +255,18 @@ public class QuadTreeNode
     public void CollectLargestEmptyCells(List<Rect> result)
     {
         // Feuille vide -> grande cellule valide
-        if (IsLeaf && !m_HasEnemy)
+        if (IsLeaf && !m_hasEnemy)
         {
-            result.Add(m_Bounds);
+            result.Add(Bounds);
             return;
         }
 
-        // Feuille occupée
+        // Feuille occupï¿½e
         if (IsLeaf)
             return;
 
         // Explorer enfants
-        foreach (var child in m_Children)
+        foreach (QuadTreeNode child in m_children)
         {
             child.CollectLargestEmptyCells(result);
         }
@@ -277,12 +282,12 @@ public class QuadTreeNode
         // Draw only leaves
         if (IsLeaf)
         {
-            DrawRect(m_Bounds);
+            DrawRect(Bounds);
             return;
         }
 
         // Otherwise recurse into children
-        foreach (QuadTreeNode child in m_Children)
+        foreach (QuadTreeNode child in m_children)
         {
             child.DrawDebug();
         }

@@ -23,7 +23,7 @@ public static class MyLogger
     public static Logger EnemiesLogger = new Logger(Debug.unityLogger.logHandler);
     public static Logger OtherCategoryLogger = new Logger(Debug.unityLogger.logHandler);
 
-    private static bool m_LogTimestamp = true;
+    private static bool m_logTimestamp = true;
 
     public static void Init()
     {
@@ -32,7 +32,7 @@ public static class MyLogger
 
         EnemiesLogger.logEnabled = true;
         OtherCategoryLogger.logEnabled = false;
-        m_LogTimestamp = true;
+        m_logTimestamp = true;
     }
 
     [System.Diagnostics.Conditional("UNITY_EDITOR")]
@@ -40,7 +40,7 @@ public static class MyLogger
     {
         string fullStr = message;
 
-        if (m_LogTimestamp) 
+        if (m_logTimestamp) 
         {
             fullStr = $"{GetTimestampString()} - {message}";
         }
@@ -78,7 +78,7 @@ public static class MyLogger
     {
         string fullStr = message;
 
-        if (m_LogTimestamp)
+        if (m_logTimestamp)
         {
             fullStr = $"{GetTimestampString()} - {message}";
         }

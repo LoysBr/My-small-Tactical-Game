@@ -14,17 +14,17 @@ public class PlaneBounds : MonoBehaviour
     /// 2 = Top Right
     /// 3 = Top Left
     /// </summary>
-    private Vector3[] m_Corners = new Vector3[4];
+    private Vector3[] m_corners = new Vector3[4];
 
     private void Awake()
     {
-        UpdateBounds();
+        RefreshCorners();
     }
 
     /// <summary>
-    /// Computes the oriented plane corners in world space.
+    /// Computes the oriented plane corners from mesh.bounds to 4 world space positions and saves them to m_corners.
     /// </summary>
-    public void UpdateBounds()
+    public void RefreshCorners()
     {
         MeshFilter meshFilter = GetComponent<MeshFilter>();
 
@@ -42,15 +42,15 @@ public class PlaneBounds : MonoBehaviour
         Vector3 topLeft = new Vector3(min.x, 0f, max.z);
 
         // Transform into world space
-        m_Corners[0] = transform.TransformPoint(bottomLeft);
-        m_Corners[1] = transform.TransformPoint(bottomRight);
-        m_Corners[2] = transform.TransformPoint(topRight);
-        m_Corners[3] = transform.TransformPoint(topLeft);
+        m_corners[0] = transform.TransformPoint(bottomLeft);
+        m_corners[1] = transform.TransformPoint(bottomRight);
+        m_corners[2] = transform.TransformPoint(topRight);
+        m_corners[3] = transform.TransformPoint(topLeft);
     }
 
     /// <summary>
     /// Returns a random point inside the oriented plane (XZ space).
-    /// Assumes m_Corners are ordered:
+    /// Assumes m_corners are ordered:
     /// 0 = Bottom Left
     /// 1 = Bottom Right
     /// 2 = Top Right
@@ -63,10 +63,10 @@ public class PlaneBounds : MonoBehaviour
 
         // Bilinear interpolation on the quad
         Vector3 point =
-            (1 - u) * (1 - v) * m_Corners[0] + // Bottom Left
-            u * (1 - v) * m_Corners[1] +       // Bottom Right
-            u * v * m_Corners[2] +             // Top Right
-            (1 - u) * v * m_Corners[3];        // Top Left
+            (1 - u) * (1 - v) * m_corners[0] + // Bottom Left
+            u * (1 - v) * m_corners[1] +       // Bottom Right
+            u * v * m_corners[2] +             // Top Right
+            (1 - u) * v * m_corners[3];        // Top Left
 
         return point;
     }
@@ -75,14 +75,14 @@ public class PlaneBounds : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        UpdateBounds();
+        RefreshCorners();
 
         Gizmos.color = Color.green;
 
         for (int i = 0; i < 4; i++)
         {
-            Vector3 a = m_Corners[i];
-            Vector3 b = m_Corners[(i + 1) % 4];
+            Vector3 a = m_corners[i];
+            Vector3 b = m_corners[(i + 1) % 4];
 
             Gizmos.DrawLine(a, b);
         }
