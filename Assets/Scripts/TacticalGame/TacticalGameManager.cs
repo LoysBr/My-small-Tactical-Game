@@ -5,14 +5,14 @@ using UnityEngine.InputSystem;
 
 public class TacticalGameManager : MonoBehaviour
 {
-    [SerializeField] private TacticalCameraController m_CameraController;
-    [SerializeField] private BG3TacticalGroundController m_GroundController; //TODO : pattern Service Locator 
-    [SerializeField] private PlayerController m_PlayerController;
-    [SerializeField] private EnemySpawner m_EnemySpawner;
+    [SerializeField] private TacticalCameraController m_cameraController;
+    [SerializeField] private BG3TacticalGroundController m_groundController; //TODO : pattern Service Locator 
+    [SerializeField] private PlayerController m_playerController;
+    [SerializeField] private EnemySpawner m_enemySpawner;
 
-    private InputActionMap m_TacticalGameMovementMap;
+    private InputActionMap m_tacticalGameMovementMap;
     
-    private ITacticalGroundStrategy m_Ground; //TODO : pattern Service Locator 
+    private ITacticalGroundStrategy m_ground; //TODO : pattern Service Locator 
 
     private void OnEnable()
     {
@@ -21,41 +21,41 @@ public class TacticalGameManager : MonoBehaviour
 
     private void Initialize()
     {
-        m_TacticalGameMovementMap = InputSystem.actions.FindActionMap("TacticalGame");
-        m_TacticalGameMovementMap.Enable();
+        m_tacticalGameMovementMap = InputSystem.actions.FindActionMap("TacticalGame");
+        m_tacticalGameMovementMap.Enable();
 
-        m_Ground = m_GroundController; //TODO : pattern Service Locator 
+        m_ground = m_groundController; //TODO : pattern Service Locator 
         MyLogger.Init();
     }
 
     private void OnDestroy()
     {
-        if (m_PlayerController)
+        if (m_playerController)
         {
-            m_PlayerController.MoveCharacterToSelectedPositionEvent -= PlayerController_OnMoveCharacterToSelectedPosition;
+            m_playerController.MoveCharacterToSelectedPositionEvent -= PlayerController_OnMoveCharacterToSelectedPosition;
         }
 
-        m_PlayerController = null;
+        m_playerController = null;
         TimerManager.ClearReferences();
         GC.Collect();
     }
 
     private void Start()
     {
-        m_PlayerController.MoveCharacterToSelectedPositionEvent += PlayerController_OnMoveCharacterToSelectedPosition;
+        m_playerController.MoveCharacterToSelectedPositionEvent += PlayerController_OnMoveCharacterToSelectedPosition;
 
         //TEST SPAWN ENEMIES
         for (int i = 0; i < 20; i++)
         {
-            m_Ground.AddEnemy(m_EnemySpawner.CreateEnemy(m_Ground.GetRandomGroundLocation()));
+            m_ground.AddEnemy(m_enemySpawner.CreateEnemy(m_ground.GetRandomGroundLocation()));
         }
         //////TEST SPAWN ENEMIES END
     }
 
     private void PlayerController_OnMoveCharacterToSelectedPosition()
     {
-        Vector3 moveTo = m_Ground.IndicateCharacterGroundLocation(m_CameraController.GetPointerScreenToRay(), ITacticalGroundStrategy.IndicationType.MovementConfirmation);
-        m_PlayerController.MoveCharacterToSelectedPosition(moveTo);
+        Vector3 moveTo = m_ground.IndicateCharacterGroundLocation(m_cameraController.GetPointerScreenToRay(), ITacticalGroundStrategy.IndicationType.MovementConfirmation);
+        m_playerController.MoveCharacterToSelectedPosition(moveTo);
     }
 
     private void Update()
@@ -63,6 +63,6 @@ public class TacticalGameManager : MonoBehaviour
         TimerManager.Update(Time.deltaTime);
 
         //TODO : "if We Are Currently Selecting A Character and Moving A Cursor to Move Character there"
-        m_Ground.IndicateCharacterGroundLocation(m_CameraController.GetPointerScreenToRay(), ITacticalGroundStrategy.IndicationType.MovementPreview);
+        m_ground.IndicateCharacterGroundLocation(m_cameraController.GetPointerScreenToRay(), ITacticalGroundStrategy.IndicationType.MovementPreview);
     }
 }

@@ -96,9 +96,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bad729faf9a8f6408d55ec3ec8de185, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SkeletonController
-  m_Animator: {fileID: 6129436000462351416}
-  m_WalkSpeed: 1
-  m_StopTargetDistance: 0.1
+  m_animator: {fileID: 6129436000462351416}
+  m_walkSpeed: 1
+  m_stopTargetDistance: 0.1
 --- !u!95 &6129436000462351416 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: be3776e9bd6e31341b3490a035f6ea50, type: 3}

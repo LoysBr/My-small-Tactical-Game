@@ -3,41 +3,41 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-    [SerializeField] private int m_SpawnCount;
-    [SerializeField] private int m_SpawnDelay; //every Xsec, spawn a new Enemy
+    [SerializeField] private int m_spawnCount;
+    [SerializeField] private int m_spawnDelay; //every Xsec, spawn a new Enemy
 
     /// <summary>
     /// Enemy prefab used by the pool.
     /// </summary>
     [SerializeField]
-    private EnemyPresenter m_EnemyPrefab;
+    private EnemyPresenter m_enemyPrefab;
 
     /// <summary>
     /// Initial amount of pooled objects.
     /// </summary>
     [SerializeField]
-    private int m_InitialPoolSize = 32;
+    private int m_initialPoolSize = 32;
 
     /// <summary>
     /// Optional parent for pooled objects.
     /// </summary>
     [SerializeField]
-    private Transform m_PoolParent;
+    private Transform m_poolParent;
 
     /// <summary>
     /// Internal presenter pool.
     /// </summary>
-    private Queue<EnemyPresenter> m_Pool = new Queue<EnemyPresenter>();
+    private Queue<EnemyPresenter> m_pool = new Queue<EnemyPresenter>();
 
     /// <summary>
     /// Active enemy models.
     /// </summary>
-    private List<EnemyModel> m_ActiveEnemies = new List<EnemyModel>();
+    private List<EnemyModel> m_activeEnemies = new List<EnemyModel>();
 
     /// <summary>
     /// Public read-only access to active enemies.
     /// </summary>
-    public IReadOnlyList<EnemyModel> ActiveEnemies => m_ActiveEnemies;
+    public IReadOnlyList<EnemyModel> ActiveEnemies => m_activeEnemies;
 
 
     /// <summary>
@@ -48,23 +48,23 @@ public class EnemySpawner : MonoBehaviour
 
     //private void Awake()
     //{
-    //    EnemyModel enemyController = m_EnemyPrefab.GetComponent<EnemyModel>();
+    //    EnemyModel enemyController = m_enemyPrefab.GetComponent<EnemyModel>();
     //    if (enemyController == null)
     //    {
-    //        MyLogger.Log("Problem with m_EnemyPrefab : no script EnemyController attached!", MyLogger.LogLevel.Error);
+    //        MyLogger.Log("Problem with m_enemyPrefab : no script EnemyController attached!", MyLogger.LogLevel.Error);
     //    }
     //}
 
     //private void Start()
     //{
-    //    m_spawnedEnemies = new List<EnemyModel>(m_SpawnCount);
+    //    m_spawnedEnemies = new List<EnemyModel>(m_spawnCount);
 
     //    SpawnEnemy(Vector3.zero);
     //}
 
     //private EnemyModel SpawnEnemy(Vector3 position)
     //{
-    //    GameObject enemyObject = GameObject.Instantiate(m_EnemyPrefab, position,
+    //    GameObject enemyObject = GameObject.Instantiate(m_enemyPrefab, position,
     //        Quaternion.LookRotation(Vector3.forward, Vector3.up), this.gameObject.transform);
 
     //    return enemyObject.GetComponent<EnemyModel>();
@@ -93,11 +93,11 @@ public class EnemySpawner : MonoBehaviour
     /// </summary>
     private void InitializePool()
     {
-        for (int i = 0; i < m_InitialPoolSize; i++)
+        for (int i = 0; i < m_initialPoolSize; i++)
         {
-            EnemyPresenter presenter = Instantiate(m_EnemyPrefab, m_PoolParent);
+            EnemyPresenter presenter = Instantiate(m_enemyPrefab, m_poolParent);
             presenter.gameObject.SetActive(false);
-            m_Pool.Enqueue(presenter);
+            m_pool.Enqueue(presenter);
         }
     }
 
@@ -117,7 +117,7 @@ public class EnemySpawner : MonoBehaviour
         // Create Enemy Model
         EnemyModel model = new EnemyModel(presenter);
 
-        m_ActiveEnemies.Add(model);
+        m_activeEnemies.Add(model);
         return model;
     }
 
@@ -130,17 +130,17 @@ public class EnemySpawner : MonoBehaviour
         if (model == null)
             return;
 
-        EnemyPresenter presenter = model.m_Presenter;
+        EnemyPresenter presenter = model.Presenter;
 
         if (presenter != null)
         {
             presenter.Clear();
             presenter.gameObject.SetActive(false);
 
-            m_Pool.Enqueue(presenter);
+            m_pool.Enqueue(presenter);
         }
 
-        m_ActiveEnemies.Remove(model);
+        m_activeEnemies.Remove(model);
     }
 
     /// <summary>
@@ -149,14 +149,14 @@ public class EnemySpawner : MonoBehaviour
     /// </summary>
     private EnemyPresenter GetPresenterFromPool()
     {
-        if (m_Pool.Count == 0)
+        if (m_pool.Count == 0)
         {
-            EnemyPresenter presenter = Instantiate(m_EnemyPrefab, m_PoolParent);
+            EnemyPresenter presenter = Instantiate(m_enemyPrefab, m_poolParent);
             presenter.gameObject.SetActive(false);
-            m_Pool.Enqueue(presenter);
+            m_pool.Enqueue(presenter);
         }
 
-        return m_Pool.Dequeue();
+        return m_pool.Dequeue();
     }
 
 

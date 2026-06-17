@@ -6,14 +6,14 @@ public class SimpleScriptableObjectEvent : ScriptableObject
 {
     private List<SimpleEventListener> m_listOfListeners;
 
-    public void Subscribe(SimpleEventListener _listener)
+    public void Subscribe(SimpleEventListener listener)
     {
-        m_listOfListeners.Add(_listener);
+        m_listOfListeners.Add(listener);
     }
 
-    public void Unsubscribe(SimpleEventListener _listener)
+    public void Unsubscribe(SimpleEventListener listener)
     {
-        m_listOfListeners.Remove(_listener);
+        m_listOfListeners.Remove(listener);
     }
 
     public void Raise()
