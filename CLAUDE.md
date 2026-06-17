@@ -56,6 +56,12 @@ Order members in this sequence:
 6. Public methods
 7. Private methods
 
+### Method Order (reading order)
+Within the method groups above, order methods by **call sequence** so the code reads top-to-bottom: place a method right after the one that first calls it.
+- After the constructor, put the first method the constructor calls, then the method called after that, and so on.
+- When adding or moving a method, position it where it is first invoked — do not append it at the end of the class.
+- Example: if the `QuadTreeGrid` constructor calls `SetMinCellSize` first, `SetMinCellSize` sits immediately after the constructor.
+
 ### Class
 - If a class had too many members, suggest me a better architecture, it's not good to have a huge Class doing too many things
 
@@ -125,7 +131,7 @@ Order members in this sequence:
 ## Method Size & Complexity
 - Keep methods under 50 lines when possible
 - Extract complex logic into separate private methods
-- One responsibility per method
+- **Single responsibility per method** — a method must do one thing. Do not bundle unrelated concerns into it (e.g. a method that computes a value must not also build/initialize unrelated state; move that to the caller or a dedicated method).
 
 ## Comments
 - Avoid obvious comments; use them only for complex logic or workarounds
