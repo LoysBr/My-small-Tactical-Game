@@ -3,51 +3,51 @@ using UnityEngine;
 
 public class TacticalCharacterController : MonoBehaviour
 {
-    [SerializeField] private Animator m_Animator;
-    [SerializeField] private float m_WalkSpeed = 1f;
-    [SerializeField] private float m_StopTargetDistance = 0.1f;
-    private float m_SqrStopTargetDistance;
+    [SerializeField] private Animator m_animator;
+    [SerializeField] private float m_walkSpeed = 1f;
+    [SerializeField] private float m_stopTargetDistance = 0.1f;
+    private float m_sqrStopTargetDistance;
 
-    private Vector3 m_MoveToPosition;
-    private Coroutine m_ResettingTriggerAttack;
+    private Vector3 m_moveToPosition;
+    private Coroutine m_resettingTriggerAttack;
 
     private void Start()
     {
         StopMoving();
-        m_SqrStopTargetDistance = m_StopTargetDistance * m_StopTargetDistance;
+        m_sqrStopTargetDistance = m_stopTargetDistance * m_stopTargetDistance;
 
-        m_Animator.speed = m_WalkSpeed;
+        m_animator.speed = m_walkSpeed;
     }
 
     public void MoveCharacterToSelectedPosition(Vector3 moveToPosition)
     {
-        m_MoveToPosition = moveToPosition;
+        m_moveToPosition = moveToPosition;
 
         Vector3 lookAtPos = new Vector3(moveToPosition.x, transform.position.y, moveToPosition.z);
         transform.LookAt(lookAtPos);
 
-        m_Animator.ResetTrigger("TriggerIdle");
-        m_Animator.ResetTrigger("TriggerAttack");
-        m_Animator.SetTrigger("TriggerWalk");
+        m_animator.ResetTrigger("TriggerIdle");
+        m_animator.ResetTrigger("TriggerAttack");
+        m_animator.SetTrigger("TriggerWalk");
     }
 
     public void PlayAttackAnimation()
     {
-        m_Animator.ResetTrigger("TriggerIdle");
-        m_Animator.ResetTrigger("TriggerWalk");
-        m_Animator.SetTrigger("TriggerAttack");
+        m_animator.ResetTrigger("TriggerIdle");
+        m_animator.ResetTrigger("TriggerWalk");
+        m_animator.SetTrigger("TriggerAttack");
 
-        if (m_ResettingTriggerAttack != null)
+        if (m_resettingTriggerAttack != null)
         {
-            StopCoroutine(m_ResettingTriggerAttack);
+            StopCoroutine(m_resettingTriggerAttack);
         }
 
-        m_ResettingTriggerAttack = StartCoroutine(ResetTriggerAttackAnimation(0.1f));
+        m_resettingTriggerAttack = StartCoroutine(ResetTriggerAttackAnimation(0.1f));
     }
 
     private void Update()
     {
-        if (Vector3.SqrMagnitude(m_MoveToPosition - transform.position) <= m_SqrStopTargetDistance)
+        if (Vector3.SqrMagnitude(m_moveToPosition - transform.position) <= m_sqrStopTargetDistance)
         {
             StopMoving();
         }
@@ -55,16 +55,16 @@ public class TacticalCharacterController : MonoBehaviour
 
     private void StopMoving()
     {
-        m_Animator.ResetTrigger("TriggerAttack");
-        m_Animator.ResetTrigger("TriggerWalk");
-        m_Animator.SetTrigger("TriggerIdle");
+        m_animator.ResetTrigger("TriggerAttack");
+        m_animator.ResetTrigger("TriggerWalk");
+        m_animator.SetTrigger("TriggerIdle");
     }
 
     //To be sure once attack it's over Animator will switch back to Idle
     private IEnumerator ResetTriggerAttackAnimation(float delay)
     {
         yield return new WaitForSeconds(delay);
-        m_Animator.ResetTrigger("TriggerAttack");
+        m_animator.ResetTrigger("TriggerAttack");
         yield return null;
     }
 }

@@ -6,21 +6,21 @@ public abstract class GenericScriptableObjectEvent<T> : ScriptableObject
 {
     private List<GenericEventListener<T>> m_listOfListeners;
 
-    public void Subscribe(GenericEventListener<T> _listener)
+    public void Subscribe(GenericEventListener<T> listener)
     {
-        m_listOfListeners.Add(_listener);
+        m_listOfListeners.Add(listener);
     }
 
-    public void Unsubscribe(GenericEventListener<T> _listener)
+    public void Unsubscribe(GenericEventListener<T> listener)
     {
-        m_listOfListeners.Remove(_listener);
+        m_listOfListeners.Remove(listener);
     }
 
-    public void Raise(T _value)
+    public void Raise(T value)
     {
         for (int i = 0; i < m_listOfListeners.Count; i++)
         {
-            m_listOfListeners[i].React(_value);
+            m_listOfListeners[i].React(value);
         }
     }
 }

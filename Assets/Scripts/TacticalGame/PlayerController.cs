@@ -6,30 +6,30 @@ public class PlayerController : MonoBehaviour
 {
     public event Action MoveCharacterToSelectedPositionEvent;
 
-    [SerializeField] private TacticalCharacterController m_SelectedCharacter;
+    [SerializeField] private TacticalCharacterController m_selectedCharacter;
 
-    private InputActionMap m_PlayerControllerActionMap;
-    private InputAction m_MoveCharacterToSelectedPosition;
-    private InputAction m_DoCharacterAttack;
+    private InputActionMap m_playerControllerActionMap;
+    private InputAction m_moveCharacterToSelectedPosition;
+    private InputAction m_doCharacterAttack;
 
 
     private void OnEnable()
     {
-        m_PlayerControllerActionMap = InputSystem.actions.FindActionMap("PlayerController");
-        m_PlayerControllerActionMap.Enable();
+        m_playerControllerActionMap = InputSystem.actions.FindActionMap("PlayerController");
+        m_playerControllerActionMap.Enable();
 
-        m_MoveCharacterToSelectedPosition = m_PlayerControllerActionMap.FindAction("MoveCharacterToSelectedPosition");
-        m_DoCharacterAttack = m_PlayerControllerActionMap.FindAction("DoCharacterAttack");
+        m_moveCharacterToSelectedPosition = m_playerControllerActionMap.FindAction("MoveCharacterToSelectedPosition");
+        m_doCharacterAttack = m_playerControllerActionMap.FindAction("DoCharacterAttack");
     }
 
     private void Update()
     {
-        if (m_MoveCharacterToSelectedPosition.IsPressed())
+        if (m_moveCharacterToSelectedPosition.IsPressed())
         {
             MoveCharacterToSelectedPositionEvent?.Invoke();
         }
 
-        if (m_DoCharacterAttack.IsPressed())
+        if (m_doCharacterAttack.IsPressed())
         {
             DoCharacterAttack();
         }
@@ -37,18 +37,18 @@ public class PlayerController : MonoBehaviour
 
     public void MoveCharacterToSelectedPosition(Vector3 moveToPosition)
     {
-        if (m_SelectedCharacter)
+        if (m_selectedCharacter)
         {
             //Debug.Log("MoveCharacterToSelectedPosition(" + position + ")");
-            m_SelectedCharacter.MoveCharacterToSelectedPosition(moveToPosition);
+            m_selectedCharacter.MoveCharacterToSelectedPosition(moveToPosition);
         }
     }
 
     public void DoCharacterAttack()
     {
-        if (m_SelectedCharacter)
+        if (m_selectedCharacter)
         {
-            m_SelectedCharacter.PlayAttackAnimation();
+            m_selectedCharacter.PlayAttackAnimation();
         }
     }
 }

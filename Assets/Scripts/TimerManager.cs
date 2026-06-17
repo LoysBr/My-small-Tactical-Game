@@ -15,15 +15,15 @@ using System;
 //testTimer.Start();
 public static class TimerManager
 {
-    private static List<Timer> _timers = null;
-    private static List<Timer> _timersAddBuffer = null;
-    private static List<Timer> _timersRemoveBuffer = null;
+    private static List<Timer> m_timers = null;
+    private static List<Timer> m_timersAddBuffer = null;
+    private static List<Timer> m_timersRemoveBuffer = null;
 
     public static void ClearReferences()
     {
-        _timers?.Clear();
-        _timersAddBuffer?.Clear();
-        _timersRemoveBuffer?.Clear();
+        m_timers?.Clear();
+        m_timersAddBuffer?.Clear();
+        m_timersRemoveBuffer?.Clear();
     }
 
     public static Timer CreateTimer()
@@ -58,23 +58,23 @@ public static class TimerManager
 
     public static void Update(float deltaTime)
     {
-        if (_timers == null)
+        if (m_timers == null)
         {
             return;
         }
-        foreach (Timer timerToRemove in _timersRemoveBuffer)
+        foreach (Timer timerToRemove in m_timersRemoveBuffer)
         {
             timerToRemove.IsRunning = false;
-            _timers.Remove(timerToRemove);
+            m_timers.Remove(timerToRemove);
         }
-        foreach (Timer timerToAdd in _timersAddBuffer)
+        foreach (Timer timerToAdd in m_timersAddBuffer)
         {
-            _timers.Add(timerToAdd);
+            m_timers.Add(timerToAdd);
         }
-        _timersAddBuffer.Clear();
-        _timersRemoveBuffer.Clear();
+        m_timersAddBuffer.Clear();
+        m_timersRemoveBuffer.Clear();
 
-        foreach (Timer timer in _timers)
+        foreach (Timer timer in m_timers)
         {
             if (timer == null || !timer.IsRunning)
             {
@@ -115,11 +115,11 @@ public static class TimerManager
 
     private static void StartTimer(Timer timer)
     {
-        if (_timers == null)
+        if (m_timers == null)
         {
-            _timers = new List<Timer>();
-            _timersAddBuffer = new List<Timer>();
-            _timersRemoveBuffer = new List<Timer>();
+            m_timers = new List<Timer>();
+            m_timersAddBuffer = new List<Timer>();
+            m_timersRemoveBuffer = new List<Timer>();
         }
 
 #if UNITY_EDITOR
@@ -131,14 +131,14 @@ public static class TimerManager
 
         if (timer != null)
         {
-            if (_timers.Contains(timer))
+            if (m_timers.Contains(timer))
             {
-                _timersRemoveBuffer.Add(timer);
+                m_timersRemoveBuffer.Add(timer);
             }
 
-            if (!_timersAddBuffer.Contains(timer))
+            if (!m_timersAddBuffer.Contains(timer))
             {
-                _timersAddBuffer.Add(timer);
+                m_timersAddBuffer.Add(timer);
             }
         }
     }
@@ -147,14 +147,14 @@ public static class TimerManager
     {
         if (timer != null)
         {
-            if (!_timersRemoveBuffer.Contains(timer))
+            if (!m_timersRemoveBuffer.Contains(timer))
             {
-                _timersRemoveBuffer.Add(timer);
+                m_timersRemoveBuffer.Add(timer);
             }
 
-            if (_timersAddBuffer.Contains(timer))
+            if (m_timersAddBuffer.Contains(timer))
             {
-                _timersAddBuffer.Remove(timer);
+                m_timersAddBuffer.Remove(timer);
             }
         }
     }
