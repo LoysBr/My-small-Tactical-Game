@@ -72,6 +72,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SkeletonEnemy
       objectReference: {fileID: 0}
+    - target: {fileID: 2864325356090707767, guid: 1fd4a1b6079c0a7408eed449e315e2eb, type: 3}
+      propertyPath: m_animator
+      value: 
+      objectReference: {fileID: 9056879220889268370}
     - target: {fileID: 7224534923948156402, guid: 1fd4a1b6079c0a7408eed449e315e2eb, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -109,3 +113,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bec3dce021069fa4bbc5e0043abfd565, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyPresenter
+--- !u!95 &9056879220889268370 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 6129436000462351416, guid: 1fd4a1b6079c0a7408eed449e315e2eb, type: 3}
+  m_PrefabInstance: {fileID: 2927443366489889962}
+  m_PrefabAsset: {fileID: 0}

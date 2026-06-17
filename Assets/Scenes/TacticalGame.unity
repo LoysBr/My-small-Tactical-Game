@@ -354,15 +354,15 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 164313257}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: 0.31785637, z: -0, w: 0.94813895}
+  m_LocalPosition: {x: -7.41, y: 0, z: 5.32}
   m_LocalScale: {x: 2, y: 1, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1283118795}
   - {fileID: 87215948}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 37.067, z: 0}
 --- !u!114 &164313262
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -375,12 +375,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eccf97f40ae2d69499e419d9879d2873, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TacticalGroundController
-  m_CharMovementPreviewIndicator: {fileID: 1283118796}
-  m_CharMovementConfirmationIndicator: {fileID: 87215949}
-  m_TacticalGridLayer:
+  m_charMovementPreviewIndicator: {fileID: 1283118796}
+  m_charMovementConfirmationIndicator: {fileID: 87215949}
+  m_tacticalGridLayer:
     serializedVersion: 2
     m_Bits: 16384
-  m_CharMovementConfirmationShowedDuration: 1.5
+  m_charMovementConfirmationShowedDuration: 1
 --- !u!114 &164313263
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -516,11 +516,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d23e846849dfdf44fa9804806c214be4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  m_SpawnCount: 0
-  m_SpawnDelay: 0
-  m_EnemyPrefab: {fileID: 152579157399328630, guid: f123e61ea85010b4fa8a39c35c5a0186, type: 3}
-  m_InitialPoolSize: 32
-  m_PoolParent: {fileID: 2085416308}
+  m_spawnCount: 0
+  m_spawnDelay: 0
+  m_enemyPrefab: {fileID: 152579157399328630, guid: f123e61ea85010b4fa8a39c35c5a0186, type: 3}
+  m_initialPoolSize: 32
+  m_poolParent: {fileID: 2085416308}
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -902,10 +902,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3fcadea381ad7e42a7a015e4f8e34f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TacticalGameManager
-  m_CameraController: {fileID: 330585548}
-  m_GroundController: {fileID: 164313262}
-  m_PlayerController: {fileID: 1150846112}
-  m_EnemySpawner: {fileID: 278894696}
+  m_cameraController: {fileID: 330585548}
+  m_groundController: {fileID: 164313262}
+  m_playerController: {fileID: 1150846112}
+  m_enemySpawner: {fileID: 278894696}
 --- !u!1 &787390300
 GameObject:
   m_ObjectHideFlags: 0
@@ -1212,7 +1212,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e627e2a7423b5d949ad9b9f15f0f1fa7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  m_SelectedCharacter: {fileID: 578026156}
+  m_selectedCharacter: {fileID: 578026156}
 --- !u!1 &1283118791
 GameObject:
   m_ObjectHideFlags: 0
