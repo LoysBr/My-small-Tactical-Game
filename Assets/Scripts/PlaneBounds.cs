@@ -6,6 +6,8 @@ using UnityEngine;
 [RequireComponent(typeof(MeshFilter))]
 public class PlaneBounds : MonoBehaviour
 {
+    public Vector3[] Corners => m_corners;
+
     /// <summary>
     /// World-space corners of the plane.
     /// Order:

@@ -21,7 +21,7 @@ public class BG3TacticalGroundController : MonoBehaviour, ITacticalGroundStrateg
     private void Awake()
     {
         m_planeBounds = GetComponent<PlaneBounds>();
-        m_enemyDensityManagementGrid = new QuadTreeGrid(20, 32);
+        m_enemyDensityManagementGrid = new QuadTreeGrid(m_planeBounds.Corners, 32);
     }
 
     public void AddEnemy(EnemyModel enemy)

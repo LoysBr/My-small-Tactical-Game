@@ -7,38 +7,93 @@ public class QuadTreeGrid
     public int MaxDepth { get { return m_maxDepth; } }
 
     private QuadTreeNode m_root;
+    private Vector3[] m_gridCornersWorldPositions;
+    private Vector3 m_widthVector;
+    private Vector3 m_heightVector;
 
-    public QuadTreeGrid(float worldSize, int maxDepth)
-    {
-        // Centre du monde � (0,0) sur XZ
-        //TODO : change this using real Ground
-        Rect worldRect = new Rect(
-            -worldSize * 0.5f,
-            -worldSize * 0.5f,
-            worldSize,
-            worldSize
+    /// <param name="gridCornersWorldPositions"> World-space corners of the plane.
+    /// Order:
+    /// 0 = Bottom Left
+    /// 1 = Bottom Right
+    /// 2 = Top Right
+    /// 3 = Top Left</param>
+    /// <param name="maxDepth"></param>
+    public QuadTreeGrid(Vector3[] gridCornersWorldPositions, int maxDepth)
+    {       
+        m_gridCornersWorldPositions = gridCornersWorldPositions;
+        m_widthVector = m_gridCornersWorldPositions[1] - m_gridCornersWorldPositions[0];
+        m_heightVector = m_gridCornersWorldPositions[3] - m_gridCornersWorldPositions[0];
+
+        // float width = Vector3.Distance(m_gridCornersWorldPositions[0], m_gridCornersWorldPositions[1]);
+        // float height = Vector3.Distance(m_gridCornersWorldPositions[0], m_gridCornersWorldPositions[3]);
+
+        Rect gridBounds = new Rect(
+            x: 0,
+            y: 0,
+            width: 1,
+            height: 1
         );
 
         m_maxDepth = maxDepth;
-        m_root = new QuadTreeNode(bounds: worldRect, depth: 0, maxDepth: m_maxDepth);
+        m_root = new QuadTreeNode(this, gridBounds, depth: 0, maxDepth: m_maxDepth);
     }
 
+    /// <param name="worldPos">Unity World 3D Position</param>
+    /// <returns>A value in grid space (0-1 range). X = horizontal/width, Y = vertical/height.</returns>
+    public Vector2 WorldPosToGridPos(Vector3 worldPos)
+    {
+        Vector3 origin = m_gridCornersWorldPositions[0];
+        Vector3 widthVector = m_gridCornersWorldPositions[1] - origin;
+        Vector3 heightVector = m_gridCornersWorldPositions[3] - origin;
+
+        //should be between 0 and 1, otherwise it means the worldPos is outside of the grid
+        float worldPosInGridWidth = Vector3.Dot(worldPos - origin, widthVector) / widthVector.sqrMagnitude; 
+        float worldPosInGridHeight = Vector3.Dot(worldPos - origin, heightVector) / heightVector.sqrMagnitude;
+        
+        return new Vector2(worldPosInGridWidth, worldPosInGridHeight);
+    }
+    
+    public Vector3 GridPosToWorldPos(Vector2 gridPos)
+    {
+        return m_gridCornersWorldPositions[0] + gridPos.x * m_widthVector + gridPos.y * m_heightVector;
+    }
+    
+    // public Vector3 GetGridWidthVector()
+    // {
+    //     return m_widthVector;
+    // }
+
+    // public Vector3 GetGridHeightVector()
+    // {
+    //     return m_heightVector;
+    // }
+
+    // public float GetGridWith()
+    // {
+    //     return Vector3.Distance(m_gridCornersWorldPositions[0], m_gridCornersWorldPositions[1]);
+    // }
+
+    // public float GetGridHeight()
+    // {
+    //     return Vector3.Distance(m_gridCornersWorldPositions[0], m_gridCornersWorldPositions[3]);
+    // }
+
     /// <summary>
-    /// Ajoute un ennemi dans le QuadTree.
+    /// Add an enemy to the QuadTree.
     /// </summary>
     public bool AddEnemy(EnemyModel enemy)
     {
         Vector3 pos = enemy.Position;
-        Vector2 point = new Vector2(pos.x, pos.z);
+        Vector2 point = WorldPosToGridPos(pos);
 
-        bool enemyIsInsideRoot = m_root.Insert(enemy, point);
+        bool enemyIsInsideRoot = m_root.Insert(enemy);
         if (!enemyIsInsideRoot)
-            MyLogger.Log($"Grid Insert Enemy Pos : {point.x}, {point.y} => ROOT does NOT contain it ???!!!", MyLogger.LogLevel.Error);
+            MyLogger.Log($"Grid Insert Enemy Pos : {enemy.Position.x}, {enemy.Position.y}, {enemy.Position.z} => ROOT does NOT contain it.", MyLogger.LogLevel.Error);
         return enemyIsInsideRoot;
     }
 
     /// <summary>
-    /// Supprime un ennemi du QuadTree.
+    /// Remove an enemy from the QuadTree.
     /// </summary>
     public bool RemoveEnemy(EnemyModel enemy)
     {
@@ -83,28 +138,34 @@ public class QuadTreeNode
 {
     private readonly int m_maxDepth;
 
+    /// <summary>
+    /// Bounds of this node in grid space (0-1 range). X = horizontal/width, Y = vertical/height.
+    /// </summary>
     public Rect Bounds { get; private set; }
 
+    private readonly QuadTreeGrid m_parentGrid; 
     private EnemyModel m_storedEnemy;
     private bool m_hasEnemy;
     private QuadTreeNode[] m_children;
     private int m_depth;
 
-    public QuadTreeNode(Rect bounds, int depth, int maxDepth)
+    public QuadTreeNode(QuadTreeGrid parentGrid, Rect bounds, int depth, int maxDepth)
     {
-        this.Bounds = bounds;
+        this.m_parentGrid = parentGrid;
         this.m_depth = depth;
         this.m_maxDepth = maxDepth;
+        this.Bounds = bounds;
     }
 
     public bool IsLeaf => m_children == null;
 
-    public bool Insert(EnemyModel enemy, Vector2 point)
+    public bool Insert(EnemyModel enemy)
     {
-        if (!Bounds.Contains(point))
+        Vector2 gridPos = m_parentGrid.WorldPosToGridPos(enemy.Position);
+
+        if (!Contains(gridPos))
             return false;
 
-        // Si feuille vide
         if (IsLeaf && !m_hasEnemy)
         {
             m_storedEnemy = enemy;
@@ -112,35 +173,38 @@ public class QuadTreeNode
             return true;
         }
 
-        // Si profondeur max atteinte
         if (m_depth >= m_maxDepth)
             return false;
 
-        // Si feuille d�j� occup�e -> subdivision
+        // leaf already busy -> subdivision
         if (IsLeaf)
         {
             Subdivide();
 
-            // R�injecter ancien ennemi
-            Vector3 oldPos = m_storedEnemy.Position;
-            Vector2 oldPoint = new Vector2(oldPos.x, oldPos.z);
-
-            EnemyModel oldEnemy = m_storedEnemy;
-
+            // Reinject former enemy
+            EnemyModel oldEnemy = m_storedEnemy; //buffer for old variable
             m_storedEnemy = null;
             m_hasEnemy = false;
-
-            InsertIntoChildren(oldEnemy, oldPoint);
+            InsertIntoChildren(oldEnemy);
         }
 
-        return InsertIntoChildren(enemy, point);
+        return InsertIntoChildren(enemy);
     }
 
-    private bool InsertIntoChildren(EnemyModel enemy, Vector2 point)
+    public bool Contains(Vector2 gridPos)
+    {
+        if (gridPos.x < Bounds.x || gridPos.x > Bounds.x + Bounds.width 
+         || gridPos.y < Bounds.y || gridPos.y > Bounds.y + Bounds.height)
+            return false;
+
+        return true;
+    }
+
+    private bool InsertIntoChildren(EnemyModel enemy)
     {
         foreach (QuadTreeNode child in m_children)
         {
-            if (child.Insert(enemy, point))
+            if (child.Insert(enemy))
                 return true;
         }
 
@@ -149,7 +213,6 @@ public class QuadTreeNode
 
     public bool Remove(EnemyModel enemy)
     {
-        // Cas feuille
         if (IsLeaf)
         {
             if (m_hasEnemy && m_storedEnemy == enemy)
@@ -162,7 +225,6 @@ public class QuadTreeNode
             return false;
         }
 
-        // sinon recherche dans enfants
         foreach (QuadTreeNode child in m_children)
         {
             if (child.Remove(enemy))
@@ -176,7 +238,7 @@ public class QuadTreeNode
     }
 
     /// <summary>
-    /// Fusionne les enfants si tous sont vides.
+    /// Merge children if all are empty to reduce tree size.
     /// </summary>
     private void TryMerge()
     {
@@ -220,52 +282,49 @@ public class QuadTreeNode
 
         float halfWidth = Bounds.width * 0.5f;
         float halfHeight = Bounds.height * 0.5f;
-
         float x = Bounds.x;
         float y = Bounds.y;
 
-        // Bas gauche
-        m_children[0] = new QuadTreeNode(
+        // bottom left
+        m_children[0] = new QuadTreeNode(m_parentGrid,
             new Rect(x, y, halfWidth, halfHeight),
             m_depth + 1, m_maxDepth
         );
 
-        // Bas droite
-        m_children[1] = new QuadTreeNode(
+        // bottom right
+        m_children[1] = new QuadTreeNode(m_parentGrid,
             new Rect(x + halfWidth, y, halfWidth, halfHeight),
             m_depth + 1, m_maxDepth
         );
 
-        // Haut gauche
-        m_children[2] = new QuadTreeNode(
+        // top left
+        m_children[2] = new QuadTreeNode(m_parentGrid,
             new Rect(x, y + halfHeight, halfWidth, halfHeight),
             m_depth + 1, m_maxDepth
         );
 
-        // Haut droite
-        m_children[3] = new QuadTreeNode(
+        // top right
+        m_children[3] = new QuadTreeNode(m_parentGrid,
             new Rect(x + halfWidth, y + halfHeight, halfWidth, halfHeight),
             m_depth + 1, m_maxDepth
         );
     }
 
     /// <summary>
-    /// Trouve les plus grandes cellules vides.
+    /// Find biggest empty cells recursively and add them to result.
     /// </summary>
     public void CollectLargestEmptyCells(List<Rect> result)
     {
-        // Feuille vide -> grande cellule valide
         if (IsLeaf && !m_hasEnemy)
         {
             result.Add(Bounds);
             return;
         }
 
-        // Feuille occup�e
+        // is already busy
         if (IsLeaf)
             return;
 
-        // Explorer enfants
         foreach (QuadTreeNode child in m_children)
         {
             child.CollectLargestEmptyCells(result);
@@ -296,12 +355,13 @@ public class QuadTreeNode
     /// <summary>
     /// Draws a Rect in XZ space.
     /// </summary>
+    /// //TODO rewrite this to use the world space corners of the grid instead of assuming a 0-1 range in grid space, to be more robust and reusable.
     private void DrawRect(Rect rect)
     {
-        Vector3 bottomLeft = new Vector3(rect.xMin, 0f, rect.yMin);
-        Vector3 bottomRight = new Vector3(rect.xMax, 0f, rect.yMin);
-        Vector3 topRight = new Vector3(rect.xMax, 0f, rect.yMax);
-        Vector3 topLeft = new Vector3(rect.xMin, 0f, rect.yMax);
+        Vector3 bottomLeft = m_parentGrid.GridPosToWorldPos(new Vector2(rect.x, rect.y));
+        Vector3 bottomRight = m_parentGrid.GridPosToWorldPos(new Vector2(rect.xMax, rect.y));
+        Vector3 topRight = m_parentGrid.GridPosToWorldPos(new Vector2(rect.xMax, rect.yMax));
+        Vector3 topLeft = m_parentGrid.GridPosToWorldPos(new Vector2(rect.x, rect.yMax));
 
         Gizmos.DrawLine(bottomLeft, bottomRight);
         Gizmos.DrawLine(bottomRight, topRight);
