@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class QuadTreeGrid
 {
-    private readonly int m_maxDepth;
+    private int m_maxDepth;
     public int MaxDepth { get { return m_maxDepth; } }
 
     private QuadTreeNode m_root;
@@ -17,25 +17,43 @@ public class QuadTreeGrid
     /// 1 = Bottom Right
     /// 2 = Top Right
     /// 3 = Top Left</param>
-    /// <param name="maxDepth"></param>
-    public QuadTreeGrid(Vector3[] gridCornersWorldPositions, int maxDepth)
-    {       
+    /// <param name="minCellSizeWidth">Wanted minimum cell width, in meters.</param>
+    /// <param name="minCellSizeHeight">Wanted minimum cell height, in meters.</param>
+    public QuadTreeGrid(Vector3[] gridCornersWorldPositions, float minCellSizeWidth, float minCellSizeHeight)
+    {
         m_gridCornersWorldPositions = gridCornersWorldPositions;
         m_widthVector = m_gridCornersWorldPositions[1] - m_gridCornersWorldPositions[0];
         m_heightVector = m_gridCornersWorldPositions[3] - m_gridCornersWorldPositions[0];
 
-        // float width = Vector3.Distance(m_gridCornersWorldPositions[0], m_gridCornersWorldPositions[1]);
-        // float height = Vector3.Distance(m_gridCornersWorldPositions[0], m_gridCornersWorldPositions[3]);
+        SetMinCellSize(minCellSizeWidth, minCellSizeHeight);
 
-        Rect gridBounds = new Rect(
-            x: 0,
-            y: 0,
-            width: 1,
-            height: 1
-        );
-
-        m_maxDepth = maxDepth;
+        Rect gridBounds = new Rect(x: 0, y: 0, width: 1, height: 1);
         m_root = new QuadTreeNode(this, gridBounds, depth: 0, maxDepth: m_maxDepth);
+
+        MyLogger.Log($"Initializing {nameof(QuadTreeGrid)} : Root node created with depth {m_maxDepth} (minimum cell size: {minCellSizeWidth}x{minCellSizeHeight})", MyLogger.LogLevel.Debug);
+    }
+
+    /// <summary>
+    /// Computes the maximum tree depth from the wanted minimum cell size (in meters).
+    /// Solves 2^maxDepth = gridSize / minCellSize on each axis and keeps the smaller
+    /// depth, so neither axis subdivides below the requested minimum cell size.
+    /// </summary>
+    public void SetMinCellSize(float width, float height)
+    {
+        if (width <= 0 || height <= 0)
+        {
+            MyLogger.Log($"{nameof(SetMinCellSize)} : cell size must be positive (got {width}x{height}). Falling back to maxDepth 0.", MyLogger.LogLevel.Error);
+            m_maxDepth = 0;
+            return;
+        }
+
+        float gridWidth = m_widthVector.magnitude;
+        float gridHeight = m_heightVector.magnitude;
+
+        int maxDepthWidth = Mathf.FloorToInt(Mathf.Log(gridWidth / width, 2f));
+        int maxDepthHeight = Mathf.FloorToInt(Mathf.Log(gridHeight / height, 2f));
+
+        m_maxDepth = Mathf.Max(0, Mathf.Min(maxDepthWidth, maxDepthHeight));
     }
 
     /// <param name="worldPos">Unity World 3D Position</param>
@@ -57,26 +75,6 @@ public class QuadTreeGrid
     {
         return m_gridCornersWorldPositions[0] + gridPos.x * m_widthVector + gridPos.y * m_heightVector;
     }
-    
-    // public Vector3 GetGridWidthVector()
-    // {
-    //     return m_widthVector;
-    // }
-
-    // public Vector3 GetGridHeightVector()
-    // {
-    //     return m_heightVector;
-    // }
-
-    // public float GetGridWith()
-    // {
-    //     return Vector3.Distance(m_gridCornersWorldPositions[0], m_gridCornersWorldPositions[1]);
-    // }
-
-    // public float GetGridHeight()
-    // {
-    //     return Vector3.Distance(m_gridCornersWorldPositions[0], m_gridCornersWorldPositions[3]);
-    // }
 
     /// <summary>
     /// Add an enemy to the QuadTree.
@@ -86,10 +84,13 @@ public class QuadTreeGrid
         Vector3 pos = enemy.Position;
         Vector2 point = WorldPosToGridPos(pos);
 
-        bool enemyIsInsideRoot = m_root.Insert(enemy);
-        if (!enemyIsInsideRoot)
-            MyLogger.Log($"Grid Insert Enemy Pos : {enemy.Position.x}, {enemy.Position.y}, {enemy.Position.z} => ROOT does NOT contain it.", MyLogger.LogLevel.Error);
-        return enemyIsInsideRoot;
+        bool couldInsert = m_root.Insert(enemy);
+        if (!couldInsert)
+        {
+            MyLogger.Log($"Grid Insert Enemy Pos : {enemy.Position.x}, {enemy.Position.y}, {enemy.Position.z} Impossible. Either position is out of the Ground, or we reached the maximum depth ( {m_maxDepth} )", MyLogger.LogLevel.Error);
+        }
+        
+        return couldInsert;
     }
 
     /// <summary>
@@ -100,13 +101,8 @@ public class QuadTreeGrid
         return m_root.Remove(enemy);
     }
 
-    public void SetMinimumCellSize(float sizeInMeter)
-    {
-
-    }
-
     /// <summary>
-    /// Retourne toutes les plus grandes cellules vides.
+    /// Returns all the largest empty cells.
     /// </summary>
     public List<Rect> GetLargestEmptyCells()
     {
