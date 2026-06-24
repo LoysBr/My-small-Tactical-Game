@@ -19,4 +19,10 @@ public interface ITacticalGroundStrategy
     public Vector3 IndicateCharacterGroundLocation(Ray screenPointToRay, IndicationType indicationType);
 
     public Vector3 GetRandomGroundLocation();
+
+    /// <summary>
+    /// Returns a spawn position that respects the enemy density rules (a cell that is
+    /// still free). Returns false when no free cell is left, so the caller can skip.
+    /// </summary>
+    public bool TryGetNewEnemyPosition(out Vector3 position);
 }
