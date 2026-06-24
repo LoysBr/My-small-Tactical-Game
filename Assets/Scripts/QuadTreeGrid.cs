@@ -1,10 +1,34 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Strategy used to pick a free cell when several branches of the QuadTree still have room.
+/// </summary>
+public enum DistributionMethod
+{
+    /// <summary>
+    /// Weighted by the number of free cells in each branch, so every free min-area cell is
+    /// equally likely. Yields a uniform spatial distribution.
+    /// </summary>
+    Uniform,
+
+    /// <summary>
+    /// Uniform among the branches that still have room: each free branch is equally likely,
+    /// regardless of how many free cells it holds.
+    /// </summary>
+    Random
+}
+
 public class QuadTreeGrid
 {
     private int m_maxDepth;
     public int MaxDepth { get { return m_maxDepth; } }
+
+    /// <summary>
+    /// Strategy used to pick a free cell when several branches still have room.
+    /// Defaults to <see cref="DistributionMethod.Random"/>.
+    /// </summary>
+    public DistributionMethod Distribution { get; set; } = DistributionMethod.Random;
 
     private QuadTreeNode m_root;
     private Vector3[] m_gridCornersWorldPositions;
@@ -438,12 +462,12 @@ public class QuadTreeNode
             return Vector2.zero;
         }            
 
-        QuadTreeNode[] childrenIfWeInstert = SplitIn4();
+        QuadTreeNode[] childrenIfWeInsert = SplitIn4();
         
         int indexOfOccupiedChild = -1;
         for (int i = 0; i < 3; i++)
         {
-            if (childrenIfWeInstert[i].Contains(m_parentGrid.WorldPosToGridPos(m_storedEnemy.Position)))
+            if (childrenIfWeInsert[i].Contains(m_parentGrid.WorldPosToGridPos(m_storedEnemy.Position)))
             {
                 MyLogger.Log($"{nameof(GetRandomPosInDividableLeaf)} indexOfOccupiedChild = {i}; ", MyLogger.LogLevel.Debug);
                 indexOfOccupiedChild = i;   
@@ -459,29 +483,97 @@ public class QuadTreeNode
         }
         MyLogger.Log($"{nameof(GetRandomPosInDividableLeaf)} using randomFreeChildIndex = {randomFreeChildIndex}; ", MyLogger.LogLevel.Debug);
 
-        return RandomPointInRect(childrenIfWeInstert[randomFreeChildIndex].Bounds);   
+        return RandomPointInRect(childrenIfWeInsert[randomFreeChildIndex].Bounds);   
     }
 
     private bool TryGetRandomFreeGridPosFromChildren(out Vector2 gridPos)
     {
+        switch (m_parentGrid.Distribution)
+        {
+            case DistributionMethod.Uniform:
+                return TryGetFreeGridPosFromEmptiestChild(out gridPos);
+
+            case DistributionMethod.Random:
+            default:
+                return TryGetFreeGridPosFromRandomChild(out gridPos);
+        }
+    }
+
+    /// <summary>
+    /// Descends into the child with the most free slots, so placements keep filling the
+    /// emptiest branch first and spread out evenly. When several children tie for the most free
+    /// slots, one of them is picked at random to avoid the bottom-left corner bias.
+    /// </summary>
+    private bool TryGetFreeGridPosFromEmptiestChild(out Vector2 gridPos)
+    {
         gridPos = Vector2.zero;
 
-        int totalFreeSlots = 0;
+        int maxFreeSlots = 0;
         foreach (QuadTreeNode child in m_children)
         {
-            totalFreeSlots += child.FreeSlots;
+            if (child.FreeSlots > maxFreeSlots)
+                maxFreeSlots = child.FreeSlots;
         }
 
-        if (totalFreeSlots <= 0)
+        if (maxFreeSlots <= 0)
             return false;
 
+        int emptiestChildCount = 0;
         foreach (QuadTreeNode child in m_children)
         {
-            int childFreeSlots = child.FreeSlots;
-            if (childFreeSlots <= 0)
+            if (child.FreeSlots == maxFreeSlots)
+                emptiestChildCount++;
+        }
+
+        int chosenEmptiestChildIndex = Random.Range(0, emptiestChildCount);
+
+        int currentEmptiestChildIndex = 0;
+        foreach (QuadTreeNode child in m_children)
+        {
+            if (child.FreeSlots != maxFreeSlots)
                 continue;
 
-            return child.TryGetRandomFreeGridPos(out gridPos);
+            if (currentEmptiestChildIndex == chosenEmptiestChildIndex)
+                return child.TryGetRandomFreeGridPos(out gridPos);
+
+            currentEmptiestChildIndex++;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Picks uniformly among the children that still have free slots. Each free branch is
+    /// equally likely, so a near-full branch is as likely as a wide-open one.
+    /// Children are ordered (bottom-left first, ...), so picking the first free child would
+    /// always bias toward the same corner; this picks one at random instead.
+    /// </summary>
+    private bool TryGetFreeGridPosFromRandomChild(out Vector2 gridPos)
+    {
+        gridPos = Vector2.zero;
+
+        int freeChildCount = 0;
+        foreach (QuadTreeNode child in m_children)
+        {
+            if (child.FreeSlots > 0)
+                freeChildCount++;
+        }
+
+        if (freeChildCount <= 0)
+            return false;
+
+        int chosenFreeChildIndex = Random.Range(0, freeChildCount);
+
+        int currentFreeChildIndex = 0;
+        foreach (QuadTreeNode child in m_children)
+        {
+            if (child.FreeSlots <= 0)
+                continue;
+
+            if (currentFreeChildIndex == chosenFreeChildIndex)
+                return child.TryGetRandomFreeGridPos(out gridPos);
+
+            currentFreeChildIndex++;
         }
 
         return false;
