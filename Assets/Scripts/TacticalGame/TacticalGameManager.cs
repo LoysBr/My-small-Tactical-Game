@@ -45,10 +45,22 @@ public class TacticalGameManager : MonoBehaviour
         m_playerController.MoveCharacterToSelectedPositionEvent += PlayerController_OnMoveCharacterToSelectedPosition;
 
         //TEST SPAWN ENEMIES
-        for (int i = 0; i < 20; i++)
+        int spawnedCount = 0;
+        int skippedCount = 0;
+        for (int i = 0; i < 10; i++)
         {
-            m_ground.AddEnemy(m_enemySpawner.CreateEnemy(m_ground.GetRandomGroundLocation()));
+            if (m_ground.TryGetNewEnemyPosition(out Vector3 spawnPosition))
+            {
+                m_ground.AddEnemy(m_enemySpawner.CreateEnemy(spawnPosition));
+                spawnedCount++;
+            }
+            else
+            {
+                skippedCount++;
+            }
         }
+
+        MyLogger.Log($"Enemy spawn: {spawnedCount} spawned, {skippedCount} skipped (grid full).", MyLogger.LogLevel.Info);
         //////TEST SPAWN ENEMIES END
     }
 

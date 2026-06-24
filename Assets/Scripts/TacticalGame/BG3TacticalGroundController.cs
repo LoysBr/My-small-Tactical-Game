@@ -8,30 +8,40 @@ public class BG3TacticalGroundController : MonoBehaviour, ITacticalGroundStrateg
     [SerializeField] private LayerMask m_tacticalGridLayer;
     [SerializeField] private float m_charMovementConfirmationShowedDuration = 1f;
 
+    /// <summary>
+    /// Minimum ground area (in square meters) reserved for each spawned enemy.
+    /// </summary>
+    [SerializeField] private float m_minAreaPerEnemy = 3f;
+
     private PlaneBounds m_planeBounds;
 
     /// <summary>
-    /// We use a Grid subdivided in Cells to control the location of the Enemies
-    /// On the Plane and their Density per Cell.
+    /// Manages where enemies are allowed to spawn on the Plane and their density,
+    /// using a Grid subdivided in Cells.
     /// </summary>
-    private QuadTreeGrid m_enemyDensityManagementGrid;
+    private PopulationDensityController m_populationDensity;
 
     private Coroutine m_hidingCharMovementConfirmation;
 
     private void Awake()
     {
         m_planeBounds = GetComponent<PlaneBounds>();
-        m_enemyDensityManagementGrid = new QuadTreeGrid(m_planeBounds.Corners, 2, 2);
+        m_populationDensity = new PopulationDensityController(m_minAreaPerEnemy, m_planeBounds);
     }
 
     public void AddEnemy(EnemyModel enemy)
     {
-        m_enemyDensityManagementGrid.AddEnemy(enemy);
+        m_populationDensity.AddEnemy(enemy);
     }
 
     public void RemoveEnemy(EnemyModel enemy)
     {
-        m_enemyDensityManagementGrid.RemoveEnemy(enemy);
+        m_populationDensity.RemoveEnemy(enemy);
+    }
+
+    public bool TryGetNewEnemyPosition(out Vector3 position)
+    {
+        return m_populationDensity.TryGetNewEnemyPosition(out position);
     }
 
     public Vector3 IndicateCharacterGroundLocation(Ray screenPointToRay, ITacticalGroundStrategy.IndicationType indicationType)
@@ -89,10 +99,10 @@ public class BG3TacticalGroundController : MonoBehaviour, ITacticalGroundStrateg
 
     private void OnDrawGizmos()
     {
-        if (m_enemyDensityManagementGrid == null)
+        if (m_populationDensity == null)
             return;
 
-        m_enemyDensityManagementGrid.DrawDebug();
+        m_populationDensity.DrawDebug();
     }
 
     ///// <summary>

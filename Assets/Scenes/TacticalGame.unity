@@ -274,7 +274,7 @@ MeshCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 164313257}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 1159214850}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -356,7 +356,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.31785637, z: -0, w: 0.94813895}
   m_LocalPosition: {x: 3.52, y: 0, z: -4.3}
-  m_LocalScale: {x: 0.5, y: 1, z: 0.5}
+  m_LocalScale: {x: 4, y: 1, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1283118795}
@@ -1213,6 +1213,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   m_selectedCharacter: {fileID: 578026156}
+--- !u!134 &1159214850
+PhysicsMaterial:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  serializedVersion: 2
+  m_DynamicFriction: 0.6
+  m_StaticFriction: 0.6
+  m_Bounciness: 0
+  m_FrictionCombine: 0
+  m_BounceCombine: 0
 --- !u!1 &1283118791
 GameObject:
   m_ObjectHideFlags: 0

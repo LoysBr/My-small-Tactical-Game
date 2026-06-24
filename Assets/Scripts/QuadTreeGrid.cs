@@ -1,10 +1,34 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Strategy used to pick a free cell when several branches of the QuadTree still have room.
+/// </summary>
+public enum DistributionMethod
+{
+    /// <summary>
+    /// Weighted by the number of free cells in each branch, so every free min-area cell is
+    /// equally likely. Yields a uniform spatial distribution.
+    /// </summary>
+    Uniform,
+
+    /// <summary>
+    /// Uniform among the branches that still have room: each free branch is equally likely,
+    /// regardless of how many free cells it holds.
+    /// </summary>
+    Random
+}
+
 public class QuadTreeGrid
 {
     private int m_maxDepth;
     public int MaxDepth { get { return m_maxDepth; } }
+
+    /// <summary>
+    /// Strategy used to pick a free cell when several branches still have room.
+    /// Defaults to <see cref="DistributionMethod.Random"/>.
+    /// </summary>
+    public DistributionMethod Distribution { get; set; } = DistributionMethod.Random;
 
     private QuadTreeNode m_root;
     private Vector3[] m_gridCornersWorldPositions;
@@ -17,43 +41,38 @@ public class QuadTreeGrid
     /// 1 = Bottom Right
     /// 2 = Top Right
     /// 3 = Top Left</param>
-    /// <param name="minCellSizeWidth">Wanted minimum cell width, in meters.</param>
-    /// <param name="minCellSizeHeight">Wanted minimum cell height, in meters.</param>
-    public QuadTreeGrid(Vector3[] gridCornersWorldPositions, float minCellSizeWidth, float minCellSizeHeight)
+    /// <param name="minArea">Wanted minimum cell area, in square meters.</param>
+    public QuadTreeGrid(Vector3[] gridCornersWorldPositions, float minArea)
     {
         m_gridCornersWorldPositions = gridCornersWorldPositions;
         m_widthVector = m_gridCornersWorldPositions[1] - m_gridCornersWorldPositions[0];
         m_heightVector = m_gridCornersWorldPositions[3] - m_gridCornersWorldPositions[0];
 
-        SetMinCellSize(minCellSizeWidth, minCellSizeHeight);
+        SetMinArea(minArea);
 
         Rect gridBounds = new Rect(x: 0, y: 0, width: 1, height: 1);
         m_root = new QuadTreeNode(this, gridBounds, depth: 0, maxDepth: m_maxDepth);
 
-        MyLogger.Log($"Initializing {nameof(QuadTreeGrid)} : Root node created with depth {m_maxDepth} (minimum cell size: {minCellSizeWidth}x{minCellSizeHeight})", MyLogger.LogLevel.Debug);
+        MyLogger.Log($"Initializing {nameof(QuadTreeGrid)} : root node created with maxDepth {m_maxDepth} (minimum cell area: {minArea} sqm)", MyLogger.LogLevel.Debug);
     }
 
     /// <summary>
-    /// Computes the maximum tree depth from the wanted minimum cell size (in meters).
-    /// Solves 2^maxDepth = gridSize / minCellSize on each axis and keeps the smaller
-    /// depth, so neither axis subdivides below the requested minimum cell size.
+    /// Computes the maximum tree depth from the wanted minimum cell area (in square meters).
+    /// Each subdivision quarters a cell's area, so this keeps the deepest level whose
+    /// cell area is still greater than or equal to the requested minimum area.
     /// </summary>
-    public void SetMinCellSize(float width, float height)
+    public void SetMinArea(float minArea)
     {
-        if (width <= 0 || height <= 0)
+        if (minArea <= 0)
         {
-            MyLogger.Log($"{nameof(SetMinCellSize)} : cell size must be positive (got {width}x{height}). Falling back to maxDepth 0.", MyLogger.LogLevel.Error);
+            MyLogger.Log($"{nameof(SetMinArea)} : cell area must be positive (got {minArea}). Falling back to maxDepth 0.", MyLogger.LogLevel.Error);
             m_maxDepth = 0;
             return;
         }
 
-        float gridWidth = m_widthVector.magnitude;
-        float gridHeight = m_heightVector.magnitude;
+        float totalArea = Vector3.Cross(m_widthVector, m_heightVector).magnitude;
 
-        int maxDepthWidth = Mathf.FloorToInt(Mathf.Log(gridWidth / width, 2f));
-        int maxDepthHeight = Mathf.FloorToInt(Mathf.Log(gridHeight / height, 2f));
-
-        m_maxDepth = Mathf.Max(0, Mathf.Min(maxDepthWidth, maxDepthHeight));
+        m_maxDepth = Mathf.Max(0, Mathf.FloorToInt(Mathf.Log(totalArea / minArea, 4f)));
     }
 
     /// <param name="worldPos">Unity World 3D Position</param>
@@ -65,12 +84,12 @@ public class QuadTreeGrid
         Vector3 heightVector = m_gridCornersWorldPositions[3] - origin;
 
         //should be between 0 and 1, otherwise it means the worldPos is outside of the grid
-        float worldPosInGridWidth = Vector3.Dot(worldPos - origin, widthVector) / widthVector.sqrMagnitude; 
+        float worldPosInGridWidth = Vector3.Dot(worldPos - origin, widthVector) / widthVector.sqrMagnitude;
         float worldPosInGridHeight = Vector3.Dot(worldPos - origin, heightVector) / heightVector.sqrMagnitude;
-        
+
         return new Vector2(worldPosInGridWidth, worldPosInGridHeight);
     }
-    
+
     public Vector3 GridPosToWorldPos(Vector2 gridPos)
     {
         return m_gridCornersWorldPositions[0] + gridPos.x * m_widthVector + gridPos.y * m_heightVector;
@@ -81,15 +100,12 @@ public class QuadTreeGrid
     /// </summary>
     public bool AddEnemy(EnemyModel enemy)
     {
-        Vector3 pos = enemy.Position;
-        Vector2 point = WorldPosToGridPos(pos);
-
         bool couldInsert = m_root.Insert(enemy);
         if (!couldInsert)
         {
             MyLogger.Log($"Grid Insert Enemy Pos : {enemy.Position.x}, {enemy.Position.y}, {enemy.Position.z} Impossible. Either position is out of the Ground, or we reached the maximum depth ( {m_maxDepth} )", MyLogger.LogLevel.Error);
         }
-        
+
         return couldInsert;
     }
 
@@ -102,28 +118,49 @@ public class QuadTreeGrid
     }
 
     /// <summary>
-    /// Returns all the largest empty cells.
+    /// Returns a random world position located in a cell that is still free (not yet
+    /// holding an enemy). Returns false when every cell is occupied.
     /// </summary>
-    public List<Rect> GetLargestEmptyCells()
+    public bool TryGetRandomPosition(out Vector3 worldPosition)
     {
-        List<Rect> result = new List<Rect>();
-        m_root.CollectLargestEmptyCells(result);
-        return result;
+        if (!m_root.TryGetRandomFreeGridPos(out Vector2 gridPos))
+        {
+            MyLogger.Log($"{nameof(TryGetRandomPosition)} : grid is full, no free cell available. No position returned.", MyLogger.LogLevel.Info);
+            worldPosition = Vector3.zero;
+            return false;
+        }
+
+        worldPosition = GridPosToWorldPos(gridPos);
+        return true;
     }
+
+    // /// <summary>
+    // /// Returns all the largest empty cells.
+    // /// </summary>
+    // public List<Rect> GetLargestEmptyCells()
+    // {
+    //     List<Rect> result = new List<Rect>();
+    //     m_root.CollectLargestEmptyCells(result);
+    //     return result;
+    // }
 
     #region Debug Drawing
 
     /// <summary>
-    /// Draws the entire QuadTree using Gizmos.
+    /// Draws the entire QuadTree using Gizmos. Busy cells (red) are drawn first and
+    /// empty cells (cyan) last, so an empty cell's color wins on a side it shares with
+    /// a busy cell.
     /// </summary>
     public void DrawDebug()
     {
         if (m_root == null)
             return;
 
-        Gizmos.color = Color.cyan;
+        Gizmos.color = Color.red;
+        m_root.DrawLeaves(drawOccupied: true);
 
-        m_root.DrawDebug();
+        Gizmos.color = Color.cyan;
+        m_root.DrawLeaves(drawOccupied: false);
     }
 
     #endregion
@@ -139,11 +176,17 @@ public class QuadTreeNode
     /// </summary>
     public Rect Bounds { get; private set; }
 
-    private readonly QuadTreeGrid m_parentGrid; 
+    private readonly QuadTreeGrid m_parentGrid;
     private EnemyModel m_storedEnemy;
     private bool m_hasEnemy;
     private QuadTreeNode[] m_children;
     private int m_depth;
+
+    /// <summary>
+    /// Number of enemies stored in this node's whole subtree. Cached to find a free
+    /// cell (or detect a full subtree) without scanning every leaf.
+    /// </summary>
+    private int m_subtreeEnemyCount;
 
     public QuadTreeNode(QuadTreeGrid parentGrid, Rect bounds, int depth, int maxDepth)
     {
@@ -155,6 +198,14 @@ public class QuadTreeNode
 
     public bool IsLeaf => m_children == null;
 
+    /// <summary>
+    /// Maximum number of enemies this node's subtree can hold (one per min-area cell).
+    /// </summary>
+    private int Capacity => 1 << (2 * (m_maxDepth - m_depth));
+
+    private int FreeSlots => Capacity - m_subtreeEnemyCount;
+
+
     public bool Insert(EnemyModel enemy)
     {
         Vector2 gridPos = m_parentGrid.WorldPosToGridPos(enemy.Position);
@@ -162,34 +213,50 @@ public class QuadTreeNode
         if (!Contains(gridPos))
             return false;
 
-        if (IsLeaf && !m_hasEnemy)
-        {
-            m_storedEnemy = enemy;
-            m_hasEnemy = true;
-            return true;
-        }
-
-        if (m_depth >= m_maxDepth)
-            return false;
-
-        // leaf already busy -> subdivision
         if (IsLeaf)
         {
+            if (!m_hasEnemy)
+            {
+                m_storedEnemy = enemy;
+                m_hasEnemy = true;
+                m_subtreeEnemyCount++;
+                return true;
+            }
+
+            // leaf already busy and this is the smallest possible cell -> reject
+            if (m_depth >= m_maxDepth)
+                return false;
+
+            // leaf already busy -> subdivision
             Subdivide();
 
-            // Reinject former enemy
+            // Reinject former enemy (already counted in m_subtreeEnemyCount)
             EnemyModel oldEnemy = m_storedEnemy; //buffer for old variable
             m_storedEnemy = null;
             m_hasEnemy = false;
             InsertIntoChildren(oldEnemy);
+
+            if (InsertIntoChildren(enemy))
+            {
+                m_subtreeEnemyCount++;
+                return true;
+            }
+
+            return false;
         }
 
-        return InsertIntoChildren(enemy);
+        if (InsertIntoChildren(enemy))
+        {
+            m_subtreeEnemyCount++;
+            return true;
+        }
+
+        return false;
     }
 
     public bool Contains(Vector2 gridPos)
     {
-        if (gridPos.x < Bounds.x || gridPos.x > Bounds.x + Bounds.width 
+        if (gridPos.x < Bounds.x || gridPos.x > Bounds.x + Bounds.width
          || gridPos.y < Bounds.y || gridPos.y > Bounds.y + Bounds.height)
             return false;
 
@@ -215,6 +282,7 @@ public class QuadTreeNode
             {
                 m_storedEnemy = null;
                 m_hasEnemy = false;
+                m_subtreeEnemyCount--;
                 return true;
             }
 
@@ -225,6 +293,7 @@ public class QuadTreeNode
         {
             if (child.Remove(enemy))
             {
+                m_subtreeEnemyCount--;
                 TryMerge();
                 return true;
             }
@@ -274,7 +343,12 @@ public class QuadTreeNode
 
     private void Subdivide()
     {
-        m_children = new QuadTreeNode[4];
+        m_children = SplitIn4();
+    }
+
+    private QuadTreeNode[] SplitIn4()
+    {
+        QuadTreeNode[] children = new QuadTreeNode[4];
 
         float halfWidth = Bounds.width * 0.5f;
         float halfHeight = Bounds.height * 0.5f;
@@ -282,76 +356,289 @@ public class QuadTreeNode
         float y = Bounds.y;
 
         // bottom left
-        m_children[0] = new QuadTreeNode(m_parentGrid,
+        children[0] = new QuadTreeNode(m_parentGrid,
             new Rect(x, y, halfWidth, halfHeight),
             m_depth + 1, m_maxDepth
         );
 
         // bottom right
-        m_children[1] = new QuadTreeNode(m_parentGrid,
+        children[1] = new QuadTreeNode(m_parentGrid,
             new Rect(x + halfWidth, y, halfWidth, halfHeight),
             m_depth + 1, m_maxDepth
         );
 
         // top left
-        m_children[2] = new QuadTreeNode(m_parentGrid,
+        children[2] = new QuadTreeNode(m_parentGrid,
             new Rect(x, y + halfHeight, halfWidth, halfHeight),
             m_depth + 1, m_maxDepth
         );
 
         // top right
-        m_children[3] = new QuadTreeNode(m_parentGrid,
+        children[3] = new QuadTreeNode(m_parentGrid,
             new Rect(x + halfWidth, y + halfHeight, halfWidth, halfHeight),
             m_depth + 1, m_maxDepth
         );
+
+        return children;
+    }
+
+    // /// <summary>
+    // /// Find biggest empty cells recursively and add them to result.
+    // /// </summary>
+    // public void CollectLargestEmptyCells(List<Rect> result)
+    // {
+    //     if (IsLeaf && !m_hasEnemy)
+    //     {
+    //         result.Add(Bounds);
+    //         return;
+    //     }
+
+    //     // is already busy
+    //     if (IsLeaf)
+    //         return;
+
+    //     foreach (QuadTreeNode child in m_children)
+    //     {
+    //         child.CollectLargestEmptyCells(result);
+    //     }
+    // }
+
+    /// <summary>
+    /// Returns a random grid-space point located in a min-area cell that is still free.
+    /// Uses the cached subtree counts to descend only into branches that have room.
+    /// </summary>
+    public bool TryGetRandomFreeGridPos(out Vector2 gridPos)
+    {
+        gridPos = Vector2.zero;
+
+        if (FreeSlots <= 0)
+        {
+            MyLogger.Log($"{GetNodeLogDescription()} : {nameof(TryGetRandomFreeGridPos)} : No free slots available. => return FALSE", MyLogger.LogLevel.Debug);
+            return false;
+        }            
+
+        // Smallest possible cell, and not full -> it is empty: any point inside is free.
+        if (m_depth >= m_maxDepth)
+        {            
+            gridPos = RandomPointInRect(Bounds);
+            MyLogger.Log($"{GetNodeLogDescription()} : {nameof(TryGetRandomFreeGridPos)} : At max depth, using random point. Return {gridPos}", MyLogger.LogLevel.Debug);
+            return true;
+        }
+
+        if (IsLeaf) // Leaf : we can find a position inside. A Leaf can have 0 or 1 Enemy
+        {
+            // 0 Enemy -> any point is free.
+            if (!m_hasEnemy) 
+            {
+                gridPos = RandomPointInRect(Bounds);
+                MyLogger.Log($"{GetNodeLogDescription()} : {nameof(TryGetRandomFreeGridPos)} : Empty Leaf, let's use RandomPointInRect(). Return {gridPos}", MyLogger.LogLevel.Debug);
+                
+                return true;
+            }
+
+            // 1 Enemy but is not full 
+            // -> check what would be the 4 children and pick a random free cell among them
+            // for now we do not insert an enemy so we do not Subdivide() yet
+            gridPos = GetRandomPosInDividableLeaf();  
+            MyLogger.Log($"{GetNodeLogDescription()} : {nameof(TryGetRandomFreeGridPos)} : Busy Leaf (but not at maxDepth) use GetRandomPosInDividableLeaf(). Return {gridPos}", MyLogger.LogLevel.Debug);
+                      
+            return true;
+        }
+
+        // not a leaf => check children
+        MyLogger.Log($"{GetNodeLogDescription()} : {nameof(TryGetRandomFreeGridPos)} : NOT a Leaf => check children", MyLogger.LogLevel.Debug);
+        return TryGetRandomFreeGridPosFromChildren(out gridPos);
     }
 
     /// <summary>
-    /// Find biggest empty cells recursively and add them to result.
+    /// Returns a random grid-space point located in the current Cell. 
+    /// To be used on busy Leaves who can still be subdivided (not at max depth yet)
     /// </summary>
-    public void CollectLargestEmptyCells(List<Rect> result)
+    private Vector2 GetRandomPosInDividableLeaf()
     {
-        if (IsLeaf && !m_hasEnemy)
+        if (!IsLeaf || m_depth >= m_maxDepth)
         {
-            result.Add(Bounds);
-            return;
+            MyLogger.Log($"Calling {nameof(GetRandomPosInDividableLeaf)} while this cell is not a leaf or at max depth", MyLogger.LogLevel.Error);
+            return Vector2.zero;
+        }            
+
+        QuadTreeNode[] childrenIfWeInsert = SplitIn4();
+        
+        int indexOfOccupiedChild = -1;
+        for (int i = 0; i < 3; i++)
+        {
+            if (childrenIfWeInsert[i].Contains(m_parentGrid.WorldPosToGridPos(m_storedEnemy.Position)))
+            {
+                MyLogger.Log($"{nameof(GetRandomPosInDividableLeaf)} indexOfOccupiedChild = {i}; ", MyLogger.LogLevel.Debug);
+                indexOfOccupiedChild = i;   
+                break;
+            }
         }
 
-        // is already busy
-        if (IsLeaf)
-            return;
+        // Get any other child, randomly
+        int randomFreeChildIndex = Random.Range(0, 4);
+        while (randomFreeChildIndex == indexOfOccupiedChild)
+        {
+            randomFreeChildIndex = Random.Range(0, 4);
+        }
+        MyLogger.Log($"{nameof(GetRandomPosInDividableLeaf)} using randomFreeChildIndex = {randomFreeChildIndex}; ", MyLogger.LogLevel.Debug);
 
+        return RandomPointInRect(childrenIfWeInsert[randomFreeChildIndex].Bounds);   
+    }
+
+    private bool TryGetRandomFreeGridPosFromChildren(out Vector2 gridPos)
+    {
+        switch (m_parentGrid.Distribution)
+        {
+            case DistributionMethod.Uniform:
+                return TryGetFreeGridPosFromEmptiestChild(out gridPos);
+
+            case DistributionMethod.Random:
+            default:
+                return TryGetFreeGridPosFromRandomChild(out gridPos);
+        }
+    }
+
+    /// <summary>
+    /// Descends into the child with the most free slots, so placements keep filling the
+    /// emptiest branch first and spread out evenly. When several children tie for the most free
+    /// slots, one of them is picked at random to avoid the bottom-left corner bias.
+    /// </summary>
+    private bool TryGetFreeGridPosFromEmptiestChild(out Vector2 gridPos)
+    {
+        gridPos = Vector2.zero;
+
+        int maxFreeSlots = 0;
         foreach (QuadTreeNode child in m_children)
         {
-            child.CollectLargestEmptyCells(result);
+            if (child.FreeSlots > maxFreeSlots)
+                maxFreeSlots = child.FreeSlots;
         }
+
+        if (maxFreeSlots <= 0)
+            return false;
+
+        int emptiestChildCount = 0;
+        foreach (QuadTreeNode child in m_children)
+        {
+            if (child.FreeSlots == maxFreeSlots)
+                emptiestChildCount++;
+        }
+
+        int chosenEmptiestChildIndex = Random.Range(0, emptiestChildCount);
+
+        int currentEmptiestChildIndex = 0;
+        foreach (QuadTreeNode child in m_children)
+        {
+            if (child.FreeSlots != maxFreeSlots)
+                continue;
+
+            if (currentEmptiestChildIndex == chosenEmptiestChildIndex)
+                return child.TryGetRandomFreeGridPos(out gridPos);
+
+            currentEmptiestChildIndex++;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Picks uniformly among the children that still have free slots. Each free branch is
+    /// equally likely, so a near-full branch is as likely as a wide-open one.
+    /// Children are ordered (bottom-left first, ...), so picking the first free child would
+    /// always bias toward the same corner; this picks one at random instead.
+    /// </summary>
+    private bool TryGetFreeGridPosFromRandomChild(out Vector2 gridPos)
+    {
+        gridPos = Vector2.zero;
+
+        int freeChildCount = 0;
+        foreach (QuadTreeNode child in m_children)
+        {
+            if (child.FreeSlots > 0)
+                freeChildCount++;
+        }
+
+        if (freeChildCount <= 0)
+            return false;
+
+        int chosenFreeChildIndex = Random.Range(0, freeChildCount);
+
+        int currentFreeChildIndex = 0;
+        foreach (QuadTreeNode child in m_children)
+        {
+            if (child.FreeSlots <= 0)
+                continue;
+
+            if (currentFreeChildIndex == chosenFreeChildIndex)
+                return child.TryGetRandomFreeGridPos(out gridPos);
+
+            currentFreeChildIndex++;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Picks a random min-area cell inside this (single-enemy) leaf, avoiding the cell
+    /// the stored enemy already occupies, and returns a random point inside it.
+    /// </summary>
+    private Vector2 RandomFreeCellPoint()
+    {
+        int cellsPerSide = 1 << (m_maxDepth - m_depth);
+        float cellWidth = Bounds.width / cellsPerSide;
+        float cellHeight = Bounds.height / cellsPerSide;
+
+        Vector2 enemyGridPos = m_parentGrid.WorldPosToGridPos(m_storedEnemy.Position);
+        int occupiedColumn = Mathf.Clamp((int)((enemyGridPos.x - Bounds.x) / cellWidth), 0, cellsPerSide - 1);
+        int occupiedRow = Mathf.Clamp((int)((enemyGridPos.y - Bounds.y) / cellHeight), 0, cellsPerSide - 1);
+
+        int column;
+        int row;
+        do
+        {
+            column = Random.Range(0, cellsPerSide);
+            row = Random.Range(0, cellsPerSide);
+        }
+        while (column == occupiedColumn && row == occupiedRow);
+
+        float cellX = Bounds.x + column * cellWidth;
+        float cellY = Bounds.y + row * cellHeight;
+
+        return new Vector2(Random.Range(cellX, cellX + cellWidth), Random.Range(cellY, cellY + cellHeight));
+    }
+
+    private static Vector2 RandomPointInRect(Rect rect)
+    {
+        return new Vector2(Random.Range(rect.xMin, rect.xMax), Random.Range(rect.yMin, rect.yMax));
     }
 
     #region Debug Drawing
 
     /// <summary>
-    /// Draws only leaf nodes recursively.
+    /// Draws every leaf whose occupied state matches <paramref name="drawOccupied"/>,
+    /// using the Gizmos color already set by the caller. Drawing busy then empty in two
+    /// passes lets an empty cell's color win on a side it shares with a busy cell.
     /// </summary>
-    public void DrawDebug()
+    public void DrawLeaves(bool drawOccupied)
     {
-        // Draw only leaves
         if (IsLeaf)
         {
-            DrawRect(Bounds);
+            if (m_hasEnemy == drawOccupied)
+                DrawRect(Bounds);
+
             return;
         }
 
-        // Otherwise recurse into children
         foreach (QuadTreeNode child in m_children)
         {
-            child.DrawDebug();
+            child.DrawLeaves(drawOccupied);
         }
     }
 
     /// <summary>
-    /// Draws a Rect in XZ space.
+    /// Draws a Rect in world space using the grid's corners.
     /// </summary>
-    /// //TODO rewrite this to use the world space corners of the grid instead of assuming a 0-1 range in grid space, to be more robust and reusable.
     private void DrawRect(Rect rect)
     {
         Vector3 bottomLeft = m_parentGrid.GridPosToWorldPos(new Vector2(rect.x, rect.y));
@@ -363,6 +650,11 @@ public class QuadTreeNode
         Gizmos.DrawLine(bottomRight, topRight);
         Gizmos.DrawLine(topRight, topLeft);
         Gizmos.DrawLine(topLeft, bottomLeft);
+    }
+
+    private string GetNodeLogDescription()
+    {
+        return $"Node depth {m_depth}, bounds {Bounds}, hasEnemy {m_hasEnemy}, subtreeEnemyCount {m_subtreeEnemyCount}";
     }
 
     #endregion
